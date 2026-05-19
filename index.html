@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>SKN4C49 | External Works Takt Tracker</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -345,13 +346,19 @@ input:focus,select.sel:focus,textarea:focus{outline:none;border-color:#3b82f6}
       <option value="Gondola-After">Gondola After MCWP</option>
       <option value="Gondola-Only">Gondola Only</option>
     </select>
-    <button class="abtn" @click="expCSV()">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>CSV
+    <button class="abtn" @click="expXLSX()" title="Export status to Excel (.xlsx)">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      <span style="color:#34d399">Excel↓</span>
     </button>
-    <button class="abtn" @click="expJSON()">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export
+    <label class="abtn cursor-p" title="Import status from Excel (.xlsx)">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <span style="color:#60a5fa">Excel↑</span>
+      <input type="file" accept=".xlsx,.xls" class="hidden" @change="impXLSX($event)">
+    </label>
+    <button class="abtn" @click="expJSON()" title="Export full JSON backup">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>JSON
     </button>
-    <label class="abtn cursor-p">
+    <label class="abtn cursor-p" title="Load JSON backup">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>Load
       <input type="file" accept=".json" class="hidden" @change="impJSON($event)">
     </label>
@@ -395,7 +402,7 @@ input:focus,select.sel:focus,textarea:focus{outline:none;border-color:#3b82f6}
 </div>
 
 <!-- LEGEND -->
-<div id="legend">
+<div id="legend" x-show="tab==='takt'">
   <div>
     <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:8px;color:#4a6b8a;
       letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px">Subcontractor / Activity</div>
@@ -415,7 +422,7 @@ input:focus,select.sel:focus,textarea:focus{outline:none;border-color:#3b82f6}
 </div>
 
 <!-- MATRIX -->
-<div id="matrix">
+<div id="matrix" x-show="tab==='takt'">
   <!-- Label panel -->
   <div id="lpanel">
     <div id="lhdr" :style="'height:'+hH+'px'"></div>
@@ -826,8 +833,18 @@ input:focus,select.sel:focus,textarea:focus{outline:none;border-color:#3b82f6}
       <span class="chip" :class="{'MCWP':'mcwp','Gondola-After':'gaf','Gondola-Only':'go'}[modal.wt]||'mcwp'" x-text="modal.wt"></span>
     </div>
     <div class="grid2 gap-2 mb-3">
-      <div><div style="font-size:8px;color:#4a6b8a;margin-bottom:2px">Planned Start</div><div style="font-size:10px;color:#7ea8cc;font-weight:700" x-text="modal.ps"></div></div>
-      <div><div style="font-size:8px;color:#4a6b8a;margin-bottom:2px">Planned End</div><div style="font-size:10px;color:#7ea8cc;font-weight:700" x-text="modal.pe"></div></div>
+      <div>
+        <label style="font-size:8px;color:#f59e0b;display:block;margin-bottom:3px;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.05em;text-transform:uppercase">
+          ✎ Planned Start
+        </label>
+        <input type="date" x-model="modal.ps" style="border-color:#f59e0b44;color:#fbbf24">
+      </div>
+      <div>
+        <label style="font-size:8px;color:#f59e0b;display:block;margin-bottom:3px;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.05em;text-transform:uppercase">
+          ✎ Planned End
+        </label>
+        <input type="date" x-model="modal.pe" style="border-color:#f59e0b44;color:#fbbf24">
+      </div>
     </div>
     <div class="space3">
       <div class="grid2 gap-2">
@@ -900,7 +917,7 @@ input:focus,select.sel:focus,textarea:focus{outline:none;border-color:#3b82f6}
 
       <div><label style="font-size:8px;color:#4a6b8a;display:block;margin-bottom:3px">Notes</label><textarea x-model="modal.notes" rows="2" class="resize-none"></textarea></div>
       <div class="grid3 gap-2" style="padding-top:.5rem;border-top:1px solid #162d4a">
-        <div><div style="font-size:8px;color:#4a6b8a">Planned Dur</div><div style="font-size:11px;color:#7ea8cc;font-weight:700" x-text="modal.dur+'d'"></div></div>
+        <div><div style="font-size:8px;color:#4a6b8a">Planned Dur</div><div style="font-size:11px;color:#7ea8cc;font-weight:700" x-text="(modal.ps&&modal.pe&&pd(modal.ps)<=pd(modal.pe))?(wkBetween(pd(modal.ps),pd(modal.pe))+1)+'d':modal.dur+'d'"></div></div>
         <div><div style="font-size:8px;color:#4a6b8a">Actual Dur</div><div style="font-size:11px;color:#7ea8cc;font-weight:700" x-text="modal.aDur!==null?modal.aDur+'d':'—'"></div></div>
         <div><div style="font-size:8px;color:#4a6b8a">Variance</div>
           <div style="font-size:11px;font-weight:700"
@@ -1486,11 +1503,18 @@ function App(){return{
     const aDur=(a.as&&a.ae)?wkBetween(pd(a.as),pd(a.ae))+1:null;
     const v=(a.ae&&a.pe)?(a.ae>a.pe?wkBetween(pd(a.pe),pd(a.ae)):-(wkBetween(pd(a.ae),pd(a.pe)))):null;
     this.modal={open:true,aid,an:a.an,wl:a.wlbl,bl:a.bid,wt:a.wtype,
-      sc:a.sc,c:a.c,ps:fmt(a.ps),pe:fmt(a.pe),as:a.as,ae:a.ae,
+      sc:a.sc,c:a.c,ps:a.ps,pe:a.pe,as:a.as,ae:a.ae,
       s:a.s,pct:a.pct,notes:a.notes,dur:a.dur,aDur,var:v,lc:Array.isArray(a.lc)?[...a.lc]:[]};
   },
   saveM(){
     const a=this.acts.find(x=>x.id===this.modal.aid);if(!a)return;
+    /* Planned dates — update if changed */
+    if(this.modal.ps) a.ps=this.modal.ps;
+    if(this.modal.pe) a.pe=this.modal.pe;
+    /* Recalculate planned duration in working days */
+    if(a.ps&&a.pe&&pd(a.ps)<=pd(a.pe)){
+      a.dur=wkBetween(pd(a.ps),pd(a.pe))+1;
+    }
     a.as=this.modal.as;a.ae=this.modal.ae;
     a.s=this.modal.s;a.pct=parseInt(this.modal.pct)||0;
     a.notes=this.modal.notes;a.lc=this.modal.lc||[];
@@ -1792,14 +1816,159 @@ function App(){return{
       method:'#06b6d4',external:'#ef4444',weather:'#10b981'};
     return cm[cat]||'#4a6b8a';
   },
-  expCSV(){
-    const h='Block,Wagon,Type,Activity,Subcontractor,PlannedStart,PlannedEnd,PlannedDur,ActualStart,ActualEnd,Status,%Complete,LateCodes,Notes';
-    const rows=this.acts.map(a=>[a.bid,a.wlbl,a.wtype,a.an,a.sc,a.ps,a.pe,a.dur,
-      a.as||'',a.ae||'',a.s,a.pct,(a.lc||[]).join('|'),a.notes||'']
-      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
-    const b=new Blob([[h,...rows].join('\n')],{type:'text/csv'});
-    const u=URL.createObjectURL(b),a=document.createElement('a');
-    a.href=u;a.download='SKN4C49_report.csv';a.click();URL.revokeObjectURL(u);
+  expXLSX(){
+    try{
+      const SL={'ns':'Not Started','ip':'In Progress','dn':'Completed'};
+      /* Sheet 1 — Status Update */
+      const hdr=['ID','Block','Wagon','Type','Activity','Subcontractor',
+        'Planned Start','Planned End','Planned Dur (d)',
+        'Actual Start','Actual End','Status','% Complete','Late Codes','Notes'];
+      const rows=[hdr];
+      this.acts.forEach(a=>{
+        rows.push([
+          a.id, a.bid, a.wlbl, a.wtype, a.an, a.sc,
+          a.ps, a.pe, a.dur,
+          a.as||'', a.ae||'',
+          SL[a.s]||'Not Started',
+          a.pct||0,
+          (a.lc||[]).join(' | '),
+          a.notes||''
+        ]);
+      });
+      const ws1=XLSX.utils.aoa_to_sheet(rows);
+      ws1['!cols']=[{wch:34},{wch:6},{wch:10},{wch:14},{wch:26},{wch:12},
+        {wch:13},{wch:13},{wch:13},{wch:13},{wch:13},{wch:13},{wch:12},{wch:28},{wch:30}];
+      ws1['!freeze']={xSplit:0,ySplit:1};
+
+      /* Sheet 2 — Block Summary */
+      const sh2=[['Block','Total','Completed','In Progress','Not Started','PPC %','Delayed','Postcon']];
+      ['419A','419B','419C','419D'].forEach(bid=>{
+        const ba=this.acts.filter(a=>a.bid===bid);
+        const done=ba.filter(a=>a.s==='dn').length;
+        const ip=ba.filter(a=>a.s==='ip').length;
+        const ns=ba.filter(a=>a.s==='ns').length;
+        const planned=ba.filter(a=>pd(a.pe)<=this.today).length;
+        const ppcN=ba.filter(a=>a.s==='dn'&&(!a.ae||a.ae<=a.pe)).length;
+        const ppc=planned>0?Math.round(ppcN/planned*100):0;
+        const del=ba.filter(a=>(a.s==='ip'&&pd(a.pe)<this.today)||(a.s==='ns'&&pd(a.ps)<this.today)).length;
+        sh2.push([bid,ba.length,done,ip,ns,ppc,del,BLOCK_DATA[bid].postcon]);
+      });
+      const ws2=XLSX.utils.aoa_to_sheet(sh2);
+      ws2['!cols']=[{wch:8},{wch:8},{wch:12},{wch:12},{wch:13},{wch:8},{wch:10},{wch:12}];
+
+      /* Sheet 3 — Late Code Reference */
+      const sh3=[['Code','Category','Description']];
+      ALL_LC.forEach(c=>sh3.push([c.id,c.catLabel,c.label.replace(c.id+' — ','')]));
+      const ws3=XLSX.utils.aoa_to_sheet(sh3);
+      ws3['!cols']=[{wch:8},{wch:16},{wch:45}];
+
+      /* Sheet 4 — Instructions */
+      const sh4=[
+        ['HOW TO USE THIS FILE'],[''],
+        ['EXPORT: Click "Excel↓" in the tracker to get a fresh copy of this file.'],
+        ['IMPORT: Fill in the "Status Update" sheet, save, then click "Excel↑" in the tracker.'],[''],
+        ['EDITABLE COLUMNS (do not change other columns or the ID column):'],
+        ['  • Actual Start    — date format: YYYY-MM-DD  e.g. 2026-05-20'],
+        ['  • Actual End      — date format: YYYY-MM-DD  e.g. 2026-05-25'],
+        ['  • Status          — must be exactly one of:  Not Started | In Progress | Completed'],
+        ['  • % Complete      — number 0 to 100'],
+        ['  • Late Codes      — separate with " | "  e.g.  MP01 | MT02  (see Late Code Reference sheet)'],
+        ['  • Notes           — free text'],[''],
+        ['DO NOT change: ID, Block, Wagon, Type, Activity, Subcontractor, Planned Start, Planned End, Planned Dur'],
+        ['The tracker matches every row by its ID — changing IDs will break the import.'],
+      ];
+      const ws4=XLSX.utils.aoa_to_sheet(sh4);
+      ws4['!cols']=[{wch:90}];
+
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws1,'Status Update');
+      XLSX.utils.book_append_sheet(wb,ws2,'Block Summary');
+      XLSX.utils.book_append_sheet(wb,ws3,'Late Code Reference');
+      XLSX.utils.book_append_sheet(wb,ws4,'Instructions');
+
+      /* Write as base64 and trigger download via data URI — works in sandboxed iframes */
+      const wbout=XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+      const fname=`SKN4C49_Takt_Status_${ds(this.today)}.xlsx`;
+      const a=document.createElement('a');
+      a.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+wbout;
+      a.download=fname;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }catch(err){
+      alert('Export failed: '+err.message);
+    }
+  },
+
+  impXLSX(ev){
+    const f=ev.target.files[0];if(!f)return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
+        const ws=wb.Sheets['Status Update'];
+        if(!ws){
+          alert('Sheet "Status Update" not found.\nPlease use the file exported by this tracker.');
+          ev.target.value='';return;
+        }
+        /* Parse with raw:false so dates come back as formatted strings */
+        const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+        const SM={
+          'not started':'ns','ns':'ns',
+          'in progress':'ip','ip':'ip',
+          'completed':'dn','dn':'dn','done':'dn'
+        };
+        /* Date normaliser — handles YYYY-MM-DD, DD/MM/YYYY, DD-Mon-YYYY, JS Date strings */
+        const normDate=v=>{
+          if(!v&&v!==0)return '';
+          const s=String(v).trim();
+          if(!s)return '';
+          /* YYYY-MM-DD */
+          if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+          /* DD/MM/YYYY or D/M/YYYY */
+          const dmy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+          if(dmy)return `${dmy[3]}-${dmy[2].padStart(2,'0')}-${dmy[1].padStart(2,'0')}`;
+          /* MM/DD/YYYY (Excel default US) */
+          const mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+          if(mdy)return `${mdy[3]}-${mdy[1].padStart(2,'0')}-${mdy[2].padStart(2,'0')}`;
+          /* Try JS Date parse as fallback */
+          const dt=new Date(s);
+          if(!isNaN(dt.getTime()))return ds(dt);
+          return '';
+        };
+        let updated=0,skipped=0;
+        rows.forEach(row=>{
+          const id=String(row['ID']||'').trim();
+          if(!id){skipped++;return;}
+          const act=this.acts.find(a=>a.id===id);
+          if(!act){skipped++;return;}
+          /* Status */
+          const rawS=String(row['Status']||'').trim().toLowerCase();
+          if(rawS&&SM[rawS]!==undefined) act.s=SM[rawS];
+          /* % Complete */
+          const rawPct=row['% Complete'];
+          if(rawPct!==''&&rawPct!==null&&rawPct!==undefined){
+            const p=parseInt(rawPct);
+            if(!isNaN(p))act.pct=Math.min(100,Math.max(0,p));
+          }
+          /* Actual dates */
+          act.as=normDate(row['Actual Start']);
+          act.ae=normDate(row['Actual End']);
+          /* Late codes — validate each against LC_MAP */
+          const rawLC=String(row['Late Codes']||'').trim();
+          act.lc=rawLC?rawLC.split(/\s*\|\s*/).map(c=>c.trim()).filter(c=>LC_MAP[c]):[];
+          /* Notes */
+          if(row['Notes']!==undefined&&row['Notes']!==null) act.notes=String(row['Notes']);
+          updated++;
+        });
+        this.build();this.calcM();this.calcDB();this.saveSt();
+        alert(`✅ Import complete!\n${updated} activities updated.\n${skipped} rows skipped (ID not found).\n\nTracker has been refreshed.`);
+      }catch(err){
+        alert('❌ Import failed: '+err.message+'\n\nUse the file exported by this tracker as your template.');
+      }
+      ev.target.value='';
+    };
+    reader.readAsArrayBuffer(f);
   },
 };}
 </script>
