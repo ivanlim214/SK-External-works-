@@ -388,6 +388,77 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #toast.ok{border-color:var(--green);color:var(--green)}
 #toast.err{border-color:var(--red);color:var(--red)}
 #toast.info{border-color:var(--cyan);color:var(--cyan)}
+
+/* ── Row action buttons ── */
+.row-actions{display:none;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+.dr:hover .row-actions{display:flex}
+.ra-btn{width:20px;height:20px;border-radius:3px;border:1px solid var(--border2);
+  background:var(--bg4);color:var(--text2);font-size:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.ra-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.ra-btn.del:hover{border-color:var(--red);color:var(--red)}
+.ra-btn.conv-g:hover{border-color:var(--green);color:var(--green)}
+.ra-btn.conv-m:hover{border-color:var(--blue);color:var(--blue)}
+
+/* Block header add button */
+.bh-add{margin-left:10px;padding:1px 8px;border-radius:3px;border:1px solid var(--cyan);
+  background:rgba(0,212,212,.1);color:var(--cyan);font-size:9px;font-family:var(--mono);
+  font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bh-add:hover{background:rgba(0,212,212,.25)}
+
+/* ── Add Unit Modal ── */
+#add-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s}
+#add-overlay.open{opacity:1;pointer-events:all}
+#add-modal{width:420px;background:#0d1929;border:1px solid #243d5e;border-radius:10px;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);transform:scale(.95);transition:transform .2s}
+#add-overlay.open #add-modal{transform:scale(1)}
+.am-head{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.am-title{font-size:15px;font-weight:700;color:var(--text)}
+.am-close{width:26px;height:26px;background:var(--bg4);border:1px solid var(--border2);
+  border-radius:5px;color:var(--text2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.am-close:hover{color:var(--text)}
+.am-body{padding:16px 18px}
+.am-field{margin-bottom:12px}
+.am-field label{display:block;font-size:10px;font-weight:700;color:var(--cyan);
+  font-family:var(--mono);letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase}
+.am-field input,.am-field select{width:100%;background:var(--bg3);border:1px solid #2a5080;
+  border-radius:5px;color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:8px 10px;outline:none;transition:border-color .15s;box-sizing:border-box;color-scheme:dark}
+.am-field input:focus,.am-field select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,212,212,.15)}
+.am-field input[type=date]:hover{border-color:var(--cyan)}
+.am-field input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.7) sepia(1) saturate(5) hue-rotate(160deg);cursor:pointer}
+.am-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.am-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.am-btn{padding:7px 18px;border-radius:5px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;border:1px solid;transition:all .15s}
+.am-btn.primary{background:var(--cyan);border-color:var(--cyan);color:#000}
+.am-btn.primary:hover{opacity:.85}
+.am-btn.secondary{background:transparent;border-color:var(--border2);color:var(--text2)}
+.am-btn.secondary:hover{border-color:var(--text2);color:var(--text)}
+
+/* Convert badge on row */
+.row-converted{font-size:7px;font-family:var(--mono);font-weight:700;
+  padding:1px 4px;border-radius:2px;margin-left:3px;background:#1a2e10;color:#22d37a;border:1px solid #1a5a36}
+.row-added{font-size:7px;font-family:var(--mono);font-weight:700;
+  padding:1px 4px;border-radius:2px;margin-left:3px;background:#0f2652;color:#5b9ef5;border:1px solid #1e3f7a}
+
+/* Confirm delete dialog */
+#confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .15s}
+#confirm-overlay.open{opacity:1;pointer-events:all}
+#confirm-box{background:#0d1929;border:1px solid #7a1a1a;border-radius:8px;
+  padding:24px 28px;width:340px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.7)}
+.cb-title{font-size:15px;font-weight:700;color:var(--red);margin-bottom:8px}
+.cb-msg{font-size:12px;color:var(--text2);margin-bottom:20px;font-family:var(--mono)}
+.cb-btns{display:flex;gap:10px;justify-content:center}
+.cb-btn{padding:7px 20px;border-radius:5px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;border:1px solid;transition:all .15s}
+.cb-btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.cb-btn.danger:hover{opacity:.85}
+.cb-btn.cancel{background:transparent;border-color:var(--border2);color:var(--text2)}
+.cb-btn.cancel:hover{border-color:var(--text2);color:var(--text)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -633,6 +704,67 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
+
+<!-- Add Unit Modal -->
+<div id="add-overlay">
+  <div id="add-modal">
+    <div class="am-head">
+      <div class="am-title" id="am-title">Add Unit</div>
+      <button class="am-close" id="am-close">✕</button>
+    </div>
+    <div class="am-body">
+      <div class="am-field">
+        <label>Block</label>
+        <select id="am-block">
+          <option>419A</option><option>419B</option><option>419C</option><option>419D</option>
+        </select>
+      </div>
+      <div class="am-field">
+        <label>Unit Name</label>
+        <input type="text" id="am-unit" placeholder="e.g. MCWP-E1 or G-Z1">
+      </div>
+      <div class="am-field">
+        <label>Type</label>
+        <select id="am-type">
+          <option value="mcwp">MCWP (Mast Climbing Work Platform)</option>
+          <option value="gond">Gondola</option>
+        </select>
+      </div>
+      <div class="am-row2">
+        <div class="am-field">
+          <label>Planned Start</label>
+          <input type="date" id="am-start">
+        </div>
+        <div class="am-field">
+          <label>Planned End</label>
+          <input type="date" id="am-end">
+        </div>
+      </div>
+      <div class="am-field">
+        <label>Reason / Notes</label>
+        <input type="text" id="am-notes" placeholder="e.g. Converted from MCWP due to site constraint">
+      </div>
+    </div>
+    <div class="am-foot">
+      <button class="am-btn secondary" id="am-cancel">Cancel</button>
+      <button class="am-btn primary" id="am-save">Add Unit ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Dialog -->
+<div id="confirm-overlay">
+  <div id="confirm-box">
+    <div class="cb-title">⚠ Delete Unit?</div>
+    <div class="cb-msg" id="cb-msg">This will remove the unit and all its recorded actuals.</div>
+    <div class="cb-btns">
+      <button class="cb-btn cancel" id="cb-cancel">Cancel</button>
+      <button class="cb-btn danger" id="cb-confirm">Delete</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
 <script>
 // ══════════════════════════════════════════════════════
 // DATA
@@ -687,6 +819,90 @@ const GOND_ONLY_CYCLE=[
 let ACTUALS = {};
 try { ACTUALS = JSON.parse(localStorage.getItem('skn_actuals')||'{}'); } catch(e){}
 function saveActuals(){ try{localStorage.setItem('skn_actuals',JSON.stringify(ACTUALS));}catch(e){} }
+
+// ── Mutable schedule overlay ──────────────────────────────────
+// USER_SCHED stores additions, deletions, and conversions on top of base SCHEDULE
+// Format: { added: {blk: [{unit,start,end,rowType,isAdded,isConverted,notes}]},
+//           deleted: Set serialised as Array }
+let USER_SCHED = { added:{}, deleted:[] };
+try {
+  const s = JSON.parse(localStorage.getItem('skn_user_sched')||'{}');
+  USER_SCHED.added   = s.added   || {};
+  USER_SCHED.deleted = s.deleted || [];
+} catch(e){}
+
+function saveUserSched(){
+  try{ localStorage.setItem('skn_user_sched', JSON.stringify(USER_SCHED)); }catch(e){}
+}
+
+// Key used to identify a unit uniquely for deletion/conversion
+function unitKey(blk, unit){ return blk+'|'+unit; }
+
+// Get the effective (merged) schedule for rendering
+function effectiveSchedule(){
+  const result = {};
+  for(const [blk, bd] of Object.entries(SCHEDULE)){
+    const deleted = new Set(USER_SCHED.deleted);
+    const added   = USER_SCHED.added[blk] || [];
+    result[blk] = {
+      block:   blk,
+      postcon: bd.postcon,
+      mcwp: [
+        ...bd.mcwp.filter(e => !deleted.has(unitKey(blk, e.unit))),
+        ...added.filter(e => e.rowType==='mcwp')
+      ],
+      gondola: [
+        ...bd.gondola.filter(e => !deleted.has(unitKey(blk, e.unit))),
+        ...added.filter(e => e.rowType==='gond')
+      ],
+    };
+  }
+  return result;
+}
+
+// Add a new unit
+function addUnit(blk, unit, rowType, start, end, notes){
+  if(!USER_SCHED.added[blk]) USER_SCHED.added[blk]=[];
+  // Remove any existing entry with same name (re-add)
+  USER_SCHED.added[blk] = USER_SCHED.added[blk].filter(e=>e.unit!==unit);
+  USER_SCHED.added[blk].push({unit, rowType, start, end, isAdded:true, notes:notes||''});
+  saveUserSched();
+}
+
+// Delete a unit (add to deleted set)
+function deleteUnit(blk, unit){
+  const k = unitKey(blk, unit);
+  if(!USER_SCHED.deleted.includes(k)) USER_SCHED.deleted.push(k);
+  // Also remove from added if it was a user-added unit
+  if(USER_SCHED.added[blk]) USER_SCHED.added[blk]=USER_SCHED.added[blk].filter(e=>e.unit!==unit);
+  // Clear actuals for this unit
+  for(const key of Object.keys(ACTUALS)){
+    if(key.startsWith(blk+'|'+unit+'|')) delete ACTUALS[key];
+  }
+  saveUserSched(); saveActuals();
+}
+
+// Convert a unit from mcwp→gond or gond→mcwp
+function convertUnit(blk, unit, fromType, toType, entry){
+  // Delete original
+  deleteUnit(blk, unit);
+  // Re-add as new type with new unit name
+  const newName = toType==='gond'
+    ? unit.replace('MCWP-','G-').replace('MCP-','G-')
+    : unit.replace(/^G-/,'MCWP-');
+  const notes = `Converted from ${fromType.toUpperCase()} to ${toType.toUpperCase()} (site constraint)`;
+  addUnit(blk, newName, toType, entry.start, entry.end, notes);
+  // Migrate actuals to new unit name
+  for(const key of Object.keys(ACTUALS)){
+    if(key.startsWith(blk+'|'+unit+'|')){
+      const newKey = key.replace(blk+'|'+unit+'|', blk+'|'+newName+'|');
+      ACTUALS[newKey] = ACTUALS[key];
+      delete ACTUALS[key];
+    }
+  }
+  saveActuals();
+  return newName;
+}
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 const TODAY = new Date('2026-05-21');
@@ -919,8 +1135,9 @@ function renderTakt(){
   }
 
   // ── Build row data ─────────────────────────────────────────────────────────
+  const EFF_SCHED = effectiveSchedule();
   let ri=0;
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(EFF_SCHED)){
     if(fBlock!=='ALL'&&fBlock!==blk) continue;
     let mcwpList=[...bd.mcwp], gondList=[...bd.gondola];
     if(fType==='MCP') gondList=[];
@@ -928,7 +1145,11 @@ function renderTakt(){
     if(!mcwpList.length&&!gondList.length) continue;
 
     // Block header
-    const bh=document.createElement('div');bh.className='block-hdr';bh.textContent=`▶  BLOCK ${blk}`;
+    const bh=document.createElement('div');bh.className='block-hdr';
+    bh.innerHTML=`<span>▶&nbsp;&nbsp;BLOCK ${blk}</span>`;
+    const addBtn=document.createElement('button');addBtn.className='bh-add';addBtn.textContent='+ Add Unit';
+    addBtn.addEventListener('click',e=>{e.stopPropagation();openAddModal(blk);});
+    bh.appendChild(addBtn);
     leftEl.appendChild(bh);
     const bhr=document.createElement('div');bhr.className='block-hdr-r';bhr.style.width=totalW+'px';
     if(bd.postcon){
@@ -944,7 +1165,7 @@ function renderTakt(){
     const allRows=[
       ...mcwpList.map(e=>({...e,rowType:'mcwp',bd})),
       ...gondList.map(e=>({...e,rowType:'gond',bd}))
-    ];
+    ].sort((a,b)=>a.unit.localeCompare(b.unit));
 
     allRows.forEach(row=>{
       const even=ri%2===0;ri++;
@@ -952,7 +1173,29 @@ function renderTakt(){
       const badge=document.createElement('span');badge.className=`row-type ${row.rowType==='mcwp'?'rt-mcp':'rt-g'}`;
       badge.textContent=row.rowType==='mcwp'?'MCP':'G';
       const ul=document.createElement('span');ul.className='row-unit';ul.textContent=row.unit;
-      lrow.appendChild(badge);lrow.appendChild(ul);leftEl.appendChild(lrow);
+      // Added/Converted badge
+      if(row.isAdded){const ab=document.createElement('span');ab.className='row-added';ab.textContent='NEW';lrow.appendChild(badge);lrow.appendChild(ul);lrow.appendChild(ab);}
+      else{lrow.appendChild(badge);lrow.appendChild(ul);}
+      // Action buttons
+      const rac=document.createElement('div');rac.className='row-actions';
+      // Convert button
+      const convBtn=document.createElement('button');
+      if(row.rowType==='mcwp'){
+        convBtn.className='ra-btn conv-g';convBtn.title='Convert to Gondola';convBtn.textContent='⇄G';
+        convBtn.addEventListener('click',e=>{e.stopPropagation();doConvert(blk,row,'mcwp','gond');});
+      } else {
+        convBtn.className='ra-btn conv-m';convBtn.title='Convert to MCWP';convBtn.textContent='⇄M';
+        convBtn.addEventListener('click',e=>{e.stopPropagation();doConvert(blk,row,'gond','mcwp');});
+      }
+      // Edit button
+      const editBtn=document.createElement('button');editBtn.className='ra-btn';editBtn.title='Edit dates';editBtn.textContent='✎';
+      editBtn.addEventListener('click',e=>{e.stopPropagation();openEditModal(blk,row);});
+      // Delete button
+      const delBtn=document.createElement('button');delBtn.className='ra-btn del';delBtn.title='Delete unit';delBtn.textContent='✕';
+      delBtn.addEventListener('click',e=>{e.stopPropagation();confirmDelete(blk,row.unit);});
+      rac.appendChild(convBtn);rac.appendChild(editBtn);rac.appendChild(delBtn);
+      lrow.appendChild(rac);
+      leftEl.appendChild(lrow);
 
       // Right row — absolute positioning instead of cell-per-column
       const rrow=document.createElement('div');rrow.className=`rr ${even?'e':'o'}`;
@@ -1062,22 +1305,20 @@ function renderTakt(){
     });
   }
 
-  // Sync header scroll
-  const scrollEl=document.getElementById('takt-scroll');
-  const whs=document.getElementById('whs');
-  // Remove old listener by cloning
-  const newScroll=scrollEl.cloneNode(false);
-  while(scrollEl.firstChild) newScroll.appendChild(scrollEl.firstChild);
-  scrollEl.parentNode.replaceChild(newScroll,scrollEl);
-  // Re-append children
-  newScroll.appendChild(document.getElementById('takt-left'));
-  newScroll.appendChild(document.getElementById('takt-right'));
-  newScroll.addEventListener('scroll',()=>{whs.scrollLeft=newScroll.scrollLeft;},{passive:true});
+  // Sync header scroll — attach once via flag, always use getElementById at event time
+  const taktScroll = document.getElementById('takt-scroll');
+  if(!taktScroll._scrollBound){
+    taktScroll._scrollBound = true;
+    taktScroll.addEventListener('scroll', ()=>{
+      const w = document.getElementById('whs');
+      if(w) w.scrollLeft = taktScroll.scrollLeft;
+    }, {passive:true});
+  }
 
   // Scroll to today
   const todayScrollPx = dateToPx(TODAY, COLS);
-  const visW = newScroll.clientWidth - 180;
-  setTimeout(()=>{ newScroll.scrollLeft = Math.max(0, todayScrollPx - visW*0.3); }, 80);
+  const visW = taktScroll.clientWidth - 180;
+  setTimeout(()=>{ taktScroll.scrollLeft = Math.max(0, todayScrollPx - visW*0.3); }, 80);
 }
 
 // Update the date pill label to show visible range
@@ -1254,13 +1495,17 @@ document.getElementById('m-save').addEventListener('click',()=>{
   renderTakt();
   updateTopKPIs();
 });
-document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal-overlay').classList.remove('open'));
-document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open');});
+(function(){
+  const mc=document.getElementById('modal-close');
+  const mo=document.getElementById('modal-overlay');
+  if(mc) mc.addEventListener('click',()=>mo.classList.remove('open'));
+  if(mo) mo.addEventListener('click',e=>{if(e.target===mo) mo.classList.remove('open');});
+})();
 
 // ── KPI update ────────────────────────────────────────────────────────────────
 function getAllUnits(){
   const all=[];
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(effectiveSchedule())){
     for(const e of bd.mcwp) all.push({blk,bd,entry:e,type:'mcwp'});
     for(const e of bd.gondola) all.push({blk,bd,entry:e,type:'gond'});
   }
@@ -1292,7 +1537,7 @@ function renderDashboard(){
   const tbody=document.getElementById('sum-tbody');tbody.innerHTML='';
   let tmu=0,tmr=0,tgu=0,tgr=0,allEnds=[];
 
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(effectiveSchedule())){
     const mcwpItems=bd.mcwp.filter(e=>e.unit.startsWith('MCWP'));
     const gItems=[...bd.gondola,...bd.mcwp.filter(e=>!e.unit.startsWith('MCWP'))];
     const mu=new Set(mcwpItems.map(e=>e.unit.split('-')[1][0])).size;
@@ -1334,7 +1579,7 @@ function renderDashboard(){
 
   // Progress bars
   const pm=document.getElementById('pm'),pg=document.getElementById('pg');pm.innerHTML='';pg.innerHTML='';
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(effectiveSchedule())){
     const mcwpItems=bd.mcwp.filter(e=>e.unit.startsWith('MCWP'));
     const gItems=[...bd.gondola,...bd.mcwp.filter(e=>!e.unit.startsWith('MCWP'))];
     let md=0,mt=0,gd=0,gt=0;
@@ -1405,7 +1650,7 @@ function renderEquipmentTable(){
   if(!tbody) return;
   tbody.innerHTML='';
 
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(effectiveSchedule())){
     // Aggregate counts
     const mcwpItems = bd.mcwp.filter(e=>e.unit.startsWith('MCWP'));
     const gItems    = [...bd.gondola, ...bd.mcwp.filter(e=>!e.unit.startsWith('MCWP'))];
@@ -1523,6 +1768,9 @@ function renderCycles(){
   });
 }
 
+// ── Wire up all event listeners once DOM is ready ────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+
 // ── Tabs & Filters ────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
@@ -1572,23 +1820,31 @@ document.getElementById('zoom-minus').addEventListener('click',()=>{
 
 // ── Prev / Next navigation ────────────────────────────────────────────────────
 document.getElementById('zoom-prev').addEventListener('click',()=>{
-  const scrollEl=document.getElementById('takt-scroll');
-  if(scrollEl) scrollEl.scrollLeft -= colW()*4;
+  const el=document.getElementById('takt-scroll'); if(el) el.scrollLeft -= colW()*4;
 });
 document.getElementById('zoom-next').addEventListener('click',()=>{
-  const scrollEl=document.getElementById('takt-scroll');
-  if(scrollEl) scrollEl.scrollLeft += colW()*4;
+  const el=document.getElementById('takt-scroll'); if(el) el.scrollLeft += colW()*4;
 });
 
 // Update date pill on scroll
-document.getElementById('takt-scroll').addEventListener('scroll',function(){
-  updateDatePill(buildSpine());
-},{passive:true});
+// Scroll listener for date pill — attached via renderTakt's _scrollBound flag above
+// Also wire it here as a fallback after first render
+(function(){
+  const el = document.getElementById('takt-scroll');
+  if(el && !el._pillBound){
+    el._pillBound = true;
+    el.addEventListener('scroll', function(){
+      updateDatePill(buildSpine());
+    }, {passive:true});
+  }
+})();
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById('today-lbl').textContent=TODAY.toLocaleDateString('en-SG',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
 renderTakt();
 updateTopKPIs();
+
+}); // end DOMContentLoaded
 
 // ══════════════════════════════════════════════════════
 // TOAST HELPER
@@ -1617,7 +1873,7 @@ function exportToExcel(){
      'Status','% Complete','Variance (d)','Delay Codes','Notes','Last Saved']
   ];
 
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(effectiveSchedule())){
     const allEntries = [
       ...bd.mcwp.map(e=>({...e, utype: e.unit.startsWith('MCWP')?'MCP':'Gondola (After MCP)'})),
       ...bd.gondola.map(e=>({...e, utype:'Gondola'}))
@@ -1674,7 +1930,7 @@ function exportToExcel(){
     ['Block','Postcon Date','MCP Units','MCP Runs','Gondola Units','Gondola Runs',
      'MCP End Date','Gondola End Date','% MCP Done','% Gondola Done']
   ];
-  for(const [blk,bd] of Object.entries(SCHEDULE)){
+  for(const [blk,bd] of Object.entries(effectiveSchedule())){
     const mcwpItems=bd.mcwp.filter(e=>e.unit.startsWith('MCWP'));
     const gItems=[...bd.gondola,...bd.mcwp.filter(e=>!e.unit.startsWith('MCWP'))];
     const mu=new Set(mcwpItems.map(e=>e.unit.split('-')[1][0])).size;
@@ -1833,7 +2089,155 @@ document.getElementById('import-input').addEventListener('change', function(){
   if(this.files&&this.files[0]){ importFromExcel(this.files[0]); this.value=''; }
 });
 
+
+// ══════════════════════════════════════════════════════
+// ADD / EDIT / DELETE / CONVERT UNIT LOGIC
+// ══════════════════════════════════════════════════════
+
+let addModalMode = 'add';  // 'add' | 'edit'
+let editCtx = null;        // {blk, row} when editing
+
+function openAddModal(blk){
+  addModalMode = 'add';
+  editCtx = null;
+  document.getElementById('am-title').textContent = 'Add Unit to Block ' + blk;
+  document.getElementById('am-block').value = blk;
+  document.getElementById('am-unit').value = '';
+  document.getElementById('am-type').value = 'mcwp';
+  document.getElementById('am-start').value = '';
+  document.getElementById('am-end').value = '';
+  document.getElementById('am-notes').value = '';
+  document.getElementById('am-save').textContent = 'Add Unit ✓';
+  document.getElementById('add-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('am-unit').focus(),100);
+}
+
+function openEditModal(blk, row){
+  addModalMode = 'edit';
+  editCtx = {blk, row};
+  document.getElementById('am-title').textContent = 'Edit Unit — ' + row.unit;
+  document.getElementById('am-block').value = blk;
+  document.getElementById('am-block').disabled = true;
+  document.getElementById('am-unit').value = row.unit;
+  document.getElementById('am-unit').disabled = true;
+  document.getElementById('am-type').value = row.rowType;
+  document.getElementById('am-type').disabled = true;
+  document.getElementById('am-start').value = row.start || '';
+  document.getElementById('am-end').value = row.end || '';
+  document.getElementById('am-notes').value = row.notes || '';
+  document.getElementById('am-save').textContent = 'Save Changes ✓';
+  document.getElementById('add-overlay').classList.add('open');
+}
+
+function closeAddModal(){
+  document.getElementById('add-overlay').classList.remove('open');
+  // Re-enable disabled fields
+  ['am-block','am-unit','am-type'].forEach(id=>{
+    document.getElementById(id).disabled = false;
+  });
+  editCtx = null;
+}
+
+document.getElementById('am-close').addEventListener('click', closeAddModal);
+document.getElementById('am-cancel').addEventListener('click', closeAddModal);
+document.getElementById('add-overlay').addEventListener('click', e=>{
+  if(e.target===document.getElementById('add-overlay')) closeAddModal();
+});
+
+document.getElementById('am-save').addEventListener('click', ()=>{
+  const blk   = document.getElementById('am-block').value;
+  const unit  = document.getElementById('am-unit').value.trim().toUpperCase();
+  const type  = document.getElementById('am-type').value;
+  const start = document.getElementById('am-start').value;
+  const end   = document.getElementById('am-end').value;
+  const notes = document.getElementById('am-notes').value.trim();
+
+  if(!unit){ showToast('Unit name is required','err'); return; }
+  if(!start||!end){ showToast('Start and End dates are required','err'); return; }
+  if(start > end){ showToast('End date must be after Start date','err'); return; }
+
+  if(addModalMode === 'edit' && editCtx){
+    // Update the existing user-added entry
+    const {blk:eb, row} = editCtx;
+    const added = USER_SCHED.added[eb] || [];
+    const idx = added.findIndex(e=>e.unit===row.unit);
+    if(idx>=0){
+      added[idx].start = start;
+      added[idx].end   = end;
+      added[idx].notes = notes;
+      USER_SCHED.added[eb] = added;
+    } else {
+      // Base schedule unit — create an override entry
+      addUnit(eb, row.unit, row.rowType, start, end, notes);
+      // Also mark original as deleted so it's replaced
+      const k = unitKey(eb, row.unit);
+      if(!USER_SCHED.deleted.includes(k)) USER_SCHED.deleted.push(k);
+    }
+    saveUserSched();
+    showToast('Unit updated', 'ok');
+  } else {
+    // Check for duplicate
+    const eff = effectiveSchedule()[blk];
+    const allExisting = [...(eff?.mcwp||[]), ...(eff?.gondola||[])];
+    if(allExisting.some(e=>e.unit===unit)){
+      showToast('Unit name "'+unit+'" already exists in '+blk,'err'); return;
+    }
+    addUnit(blk, unit, type, start, end, notes);
+    showToast('Unit '+unit+' added to '+blk, 'ok');
+  }
+
+  closeAddModal();
+  renderTakt();
+  updateTopKPIs();
+});
+
+// ── Delete confirm ───────────────────────────────────────────
+let pendingDelete = null;
+
+function confirmDelete(blk, unit){
+  pendingDelete = {blk, unit};
+  document.getElementById('cb-msg').textContent =
+    'Delete "'+unit+'" from Block '+blk+'? All recorded actuals will also be removed.';
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+document.getElementById('cb-cancel').addEventListener('click',()=>{
+  pendingDelete=null;
+  document.getElementById('confirm-overlay').classList.remove('open');
+});
+document.getElementById('cb-confirm').addEventListener('click',()=>{
+  if(pendingDelete){
+    deleteUnit(pendingDelete.blk, pendingDelete.unit);
+    showToast('Unit "'+pendingDelete.unit+'" deleted','ok');
+    pendingDelete=null;
+    document.getElementById('confirm-overlay').classList.remove('open');
+    renderTakt();
+    updateTopKPIs();
+  }
+});
+
+// ── Convert unit ─────────────────────────────────────────────
+function doConvert(blk, row, fromType, toType){
+  const label = toType==='gond' ? 'Gondola' : 'MCWP';
+  const newName = convertUnit(blk, row.unit, fromType, toType, row);
+  showToast(row.unit+' converted to '+label+' as '+newName, 'ok', 4000);
+  renderTakt();
+  updateTopKPIs();
+}
+
+// ── Auto-suggest unit name based on block + type ─────────────
+document.getElementById('am-type').addEventListener('change', function(){
+  const unit = document.getElementById('am-unit').value.trim();
+  if(!unit) return;  // don't overwrite if user typed something
+  // Suggest prefix
+  if(this.value==='mcwp' && unit.startsWith('G-')){
+    document.getElementById('am-unit').value = unit.replace('G-','MCWP-');
+  } else if(this.value==='gond' && unit.startsWith('MCWP-')){
+    document.getElementById('am-unit').value = unit.replace('MCWP-','G-');
+  }
+});
+
 </script>
-<div id="toast"></div>
+
 </body>
 </html>
