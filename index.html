@@ -190,11 +190,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .field .planned-val{font-size:13px;font-family:var(--mono);color:var(--yellow);
   background:var(--bg3);padding:7px 10px;border-radius:5px;border:1px solid var(--border2)}
 .field input[type=date],.field select,.field input[type=number],.field textarea{
-  width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;
+  width:100%;background:var(--bg3);border:1px solid #2a5080;border-radius:5px;
   color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;
-  outline:none;transition:border-color .15s}
+  outline:none;transition:border-color .15s;box-sizing:border-box}
 .field input[type=date]:focus,.field select:focus,.field input[type=number]:focus,.field textarea:focus{
-  border-color:var(--cyan)}
+  border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,212,212,.15)}
+.field input[type=date]{color-scheme:dark;cursor:pointer}
+.field input[type=date]:hover{border-color:var(--cyan)}
+.field input[type=date]::-webkit-calendar-picker-indicator{
+  filter:invert(0.7) sepia(1) saturate(5) hue-rotate(160deg);cursor:pointer}
 .field select option{background:var(--bg3);color:var(--text)}
 .field textarea{resize:vertical;min-height:60px;font-size:11px}
 .pct-input{display:flex;align-items:center;gap:8px}
@@ -1029,17 +1033,21 @@ function renderTakt(){
           chip.style.color      = col;
         }
 
-        // % complete progress fill
-        if(status==='in-progress'&&actual.pct>0){
+        // % complete progress fill — shown for ALL statuses when 0 < pct < 100
+        const pct = actual.pct || 0;
+        if(pct > 0 && pct < 100){
           const pf=document.createElement('div');
-          pf.style.cssText=`position:absolute;left:0;top:0;bottom:0;width:${actual.pct}%;background:${col}22;border-radius:inherit;pointer-events:none`;
+          pf.style.cssText=`position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${col}44;border-radius:inherit;pointer-events:none`;
           chip.appendChild(pf);
+          const tick=document.createElement('div');
+          tick.style.cssText=`position:absolute;left:${pct}%;top:1px;bottom:1px;width:2px;background:${col};pointer-events:none`;
+          chip.appendChild(tick);
         }
 
         const lbl=chipLabel(act,w);
         if(lbl){const sp=document.createElement('span');sp.textContent=lbl;sp.style.cssText='position:relative;z-index:1;pointer-events:none';chip.appendChild(sp);}
 
-        chip.title=`${act.name}\n${act.sub} · ${row.unit} · ${blk}\n${fmt(as)} → ${fmt(ae)}\nStatus: ${status}`;
+        chip.title=`${act.name}\n${act.sub} · ${row.unit} · ${blk}\n${fmt(as)} → ${fmt(ae)}\nStatus: ${status}${pct>0?' | '+pct+'% done':''}`;
         chip.addEventListener('click',e=>{e.stopPropagation();openModal(blk,row,act);});
         rrow.appendChild(chip);
       });
@@ -1177,9 +1185,42 @@ function updateVarDisplay(as,ae,planDur){
   }
 }
 
-document.getElementById('m-stat').addEventListener('change',function(){updateStatusBadge(this.value);});
+document.getElementById('m-stat').addEventListener('change',function(){
+  updateStatusBadge(this.value);
+  const asEl=document.getElementById('m-as');
+  const aeEl=document.getElementById('m-ae');
+  const pctEl=document.getElementById('m-pct');
+  const pd2=modalCtx?diffDays(pd(modalCtx.act.actStart),pd(modalCtx.act.actEnd))+1:1;
+  if(this.value==='in-progress' && !asEl.value){
+    asEl.value=ds(TODAY);
+    updateVarDisplay(asEl.value,aeEl.value,pd2);
+  }
+  if(this.value==='completed'){
+    if(!asEl.value) asEl.value=modalCtx?modalCtx.act.actStart:ds(TODAY);
+    if(!aeEl.value) aeEl.value=ds(TODAY);
+    pctEl.value=100;
+    document.getElementById('m-pct-bar').style.width='100%';
+    updateVarDisplay(asEl.value,aeEl.value,pd2);
+  }
+});
 document.getElementById('m-pct').addEventListener('input',function(){
-  document.getElementById('m-pct-bar').style.width=Math.min(100,Math.max(0,this.value))+'%';
+  const val=Math.min(100,Math.max(0,parseInt(this.value)||0));
+  this.value=val;
+  document.getElementById('m-pct-bar').style.width=val+'%';
+  const statEl=document.getElementById('m-stat');
+  if(val===100 && statEl.value!=='completed'){
+    statEl.value='completed'; updateStatusBadge('completed');
+    const asEl=document.getElementById('m-as');
+    const aeEl=document.getElementById('m-ae');
+    if(!asEl.value) asEl.value=modalCtx?modalCtx.act.actStart:ds(TODAY);
+    if(!aeEl.value) aeEl.value=ds(TODAY);
+    const pd2=modalCtx?diffDays(pd(modalCtx.act.actStart),pd(modalCtx.act.actEnd))+1:1;
+    updateVarDisplay(asEl.value,aeEl.value,pd2);
+  } else if(val>0 && val<100 && statEl.value==='not-started'){
+    statEl.value='in-progress'; updateStatusBadge('in-progress');
+    const asEl=document.getElementById('m-as');
+    if(!asEl.value){ asEl.value=ds(TODAY); updateVarDisplay(asEl.value,'',diffDays(pd(modalCtx.act.actStart),pd(modalCtx.act.actEnd))+1); }
+  }
 });
 document.getElementById('m-as').addEventListener('change',function(){
   const ae=document.getElementById('m-ae').value;
