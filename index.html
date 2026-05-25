@@ -459,6 +459,62 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .cb-btn.danger:hover{opacity:.85}
 .cb-btn.cancel{background:transparent;border-color:var(--border2);color:var(--text2)}
 .cb-btn.cancel:hover{border-color:var(--text2);color:var(--text)}
+
+/* ── Undo system ── */
+.undo-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;
+  border-radius:5px;font-family:var(--mono);font-size:11px;font-weight:700;
+  cursor:pointer;border:1px solid;letter-spacing:.3px;transition:all .15s;white-space:nowrap;
+  background:rgba(155,114,207,.12);border-color:#5a3a8a;color:#9b72cf}
+.undo-btn:hover{background:rgba(155,114,207,.25)}
+.undo-btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.undo-count{display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border-radius:50%;background:#5a3a8a;
+  font-size:9px;color:#fff;font-weight:700}
+
+/* History panel */
+#history-panel{position:fixed;top:52px;right:0;width:340px;
+  background:#0d1929;border-left:1px solid #243d5e;border-bottom:1px solid #243d5e;
+  border-radius:0 0 0 10px;box-shadow:-6px 6px 30px rgba(0,0,0,.6);
+  z-index:150;transform:translateX(100%);transition:transform .25s ease;
+  max-height:calc(100vh - 52px);display:flex;flex-direction:column}
+#history-panel.open{transform:translateX(0)}
+.hp-head{padding:13px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.hp-title{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--purple)}
+.hp-close{width:24px;height:24px;background:var(--bg4);border:1px solid var(--border2);
+  border-radius:4px;color:var(--text2);font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.hp-close:hover{color:var(--text)}
+.hp-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) var(--bg)}
+.hp-empty{padding:24px;text-align:center;color:var(--text3);font-size:12px;font-family:var(--mono)}
+.hp-item{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;
+  align-items:flex-start;gap:10px;transition:background .15s}
+.hp-item:hover{background:rgba(255,255,255,.03)}
+.hp-item.current{background:rgba(0,212,212,.05);border-left:3px solid var(--cyan)}
+.hp-item.undone{opacity:.45}
+.hp-icon{font-size:16px;margin-top:1px;flex-shrink:0}
+.hp-info{flex:1;min-width:0}
+.hp-action{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
+.hp-detail{font-size:10px;color:var(--text2);font-family:var(--mono);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-time{font-size:9px;color:var(--text3);font-family:var(--mono);flex-shrink:0}
+.hp-actions{display:flex;gap:4px;margin-top:5px}
+.hp-undo-btn{padding:2px 8px;border-radius:3px;border:1px solid #5a3a8a;
+  background:transparent;color:#9b72cf;font-size:9px;font-family:var(--mono);
+  cursor:pointer;transition:all .15s}
+.hp-undo-btn:hover{background:rgba(155,114,207,.2)}
+.hp-redo-btn{padding:2px 8px;border-radius:3px;border:1px solid var(--border2);
+  background:transparent;color:var(--text2);font-size:9px;font-family:var(--mono);
+  cursor:pointer;transition:all .15s}
+.hp-redo-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.hp-foot{padding:10px 16px;border-top:1px solid var(--border);
+  display:flex;gap:6px;flex-shrink:0}
+.hp-foot-btn{flex:1;padding:6px;border-radius:5px;font-family:var(--mono);font-size:10px;
+  font-weight:700;cursor:pointer;border:1px solid;transition:all .15s;text-align:center}
+.hp-undo-all{border-color:#5a3a8a;color:#9b72cf;background:transparent}
+.hp-undo-all:hover{background:rgba(155,114,207,.15)}
+.hp-clear{border-color:var(--border2);color:var(--text3);background:transparent}
+.hp-clear:hover{border-color:var(--red);color:var(--red)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -484,6 +540,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
     <div class="td"></div>
     <button class="io-btn export-btn" id="btn-export" title="Export status to Excel">⬇ Export XLSX</button>
+    <button class="undo-btn" id="btn-undo" title="Undo last action" disabled>↩ Undo <span class="undo-count" id="undo-count" style="display:none">0</span></button>
+    <button class="undo-btn" id="btn-history" title="View change history" style="background:rgba(155,114,207,.06);padding:4px 10px">📋</button>
     <label class="io-btn import-btn" title="Import status from Excel">
       ⬆ Import XLSX
       <input type="file" id="import-input" accept=".xlsx" style="display:none">
@@ -705,6 +763,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 </div>
 
 
+
+<!-- History / Undo Panel -->
+<div id="history-panel">
+  <div class="hp-head">
+    <div class="hp-title">📋  Change History</div>
+    <button class="hp-close" id="hp-close">✕</button>
+  </div>
+  <div class="hp-list" id="hp-list">
+    <div class="hp-empty">No changes recorded yet.</div>
+  </div>
+  <div class="hp-foot">
+    <button class="hp-foot-btn hp-undo-all" id="hp-undo-all">↩ Undo Last</button>
+    <button class="hp-foot-btn hp-clear" id="hp-clear-history">Clear History</button>
+  </div>
+</div>
 <!-- Add Unit Modal -->
 <div id="add-overlay">
   <div id="add-modal">
@@ -820,6 +893,200 @@ let ACTUALS = {};
 try { ACTUALS = JSON.parse(localStorage.getItem('skn_actuals')||'{}'); } catch(e){}
 function saveActuals(){ try{localStorage.setItem('skn_actuals',JSON.stringify(ACTUALS));}catch(e){} }
 
+
+// ══════════════════════════════════════════════════════
+// UNDO / REDO HISTORY ENGINE
+// ══════════════════════════════════════════════════════
+
+const MAX_HISTORY = 50;
+let HISTORY = [];   // stack of snapshots { id, action, detail, icon, time, actuals, userSched }
+let HIST_POS = -1;  // current position in history (-1 = no history)
+// HIST_POS always points to the LAST APPLIED action
+// Undo moves back, Redo moves forward
+
+function snapshotState(){
+  return {
+    actuals:   JSON.parse(JSON.stringify(ACTUALS)),
+    userSched: JSON.parse(JSON.stringify(USER_SCHED)),
+  };
+}
+
+function pushHistory(action, detail, icon='📝'){
+  // Truncate any redo states ahead of current position
+  if(HIST_POS < HISTORY.length - 1){
+    HISTORY = HISTORY.slice(0, HIST_POS + 1);
+  }
+  // Capture state BEFORE this action was applied
+  // We store the PREVIOUS state so undo can restore it
+  const snap = snapshotState();
+  HISTORY.push({
+    id: Date.now(),
+    action, detail, icon,
+    time: new Date().toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    // snapshot taken AFTER the action — store both before and after
+    snapshot: snap,
+  });
+  // Cap history
+  if(HISTORY.length > MAX_HISTORY) HISTORY.shift();
+  HIST_POS = HISTORY.length - 1;
+  updateUndoUI();
+  renderHistoryPanel();
+}
+
+// Capture state BEFORE any mutation — call this BEFORE changing ACTUALS/USER_SCHED
+function captureBeforeState(){
+  return snapshotState();
+}
+
+// Commit: push with the before-state stored
+let _beforeState = null;
+function beginAction(action, detail, icon='📝'){
+  _beforeState = { action, detail, icon, before: snapshotState() };
+}
+function commitAction(){
+  if(!_beforeState) return;
+  const {action, detail, icon, before} = _beforeState;
+  if(HIST_POS < HISTORY.length - 1) HISTORY = HISTORY.slice(0, HIST_POS + 1);
+  HISTORY.push({
+    id: Date.now(), action, detail, icon,
+    time: new Date().toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    before,  // state before action
+    after: snapshotState(),  // state after action
+  });
+  if(HISTORY.length > MAX_HISTORY) HISTORY.shift();
+  HIST_POS = HISTORY.length - 1;
+  _beforeState = null;
+  updateUndoUI();
+  renderHistoryPanel();
+}
+
+function doUndo(){
+  if(HIST_POS < 0) return;
+  const entry = HISTORY[HIST_POS];
+  if(!entry || !entry.before) return;
+  // Restore the before-state
+  ACTUALS    = JSON.parse(JSON.stringify(entry.before.actuals));
+  USER_SCHED = JSON.parse(JSON.stringify(entry.before.userSched));
+  saveActuals();
+  saveUserSched();
+  HIST_POS--;
+  updateUndoUI();
+  renderHistoryPanel();
+  renderTakt();
+  updateTopKPIs();
+  showToast('↩ Undone: ' + entry.action, 'info', 3000);
+}
+
+function doRedo(){
+  if(HIST_POS >= HISTORY.length - 1) return;
+  HIST_POS++;
+  const entry = HISTORY[HIST_POS];
+  if(!entry || !entry.after) return;
+  // Restore the after-state
+  ACTUALS    = JSON.parse(JSON.stringify(entry.after.actuals));
+  USER_SCHED = JSON.parse(JSON.stringify(entry.after.userSched));
+  saveActuals();
+  saveUserSched();
+  updateUndoUI();
+  renderHistoryPanel();
+  renderTakt();
+  updateTopKPIs();
+  showToast('↪ Redone: ' + entry.action, 'info', 3000);
+}
+
+function updateUndoUI(){
+  const undoBtn   = document.getElementById('btn-undo');
+  const cntBadge  = document.getElementById('undo-count');
+  const available = HIST_POS + 1;  // number of undoable actions
+  if(undoBtn){
+    undoBtn.disabled = (HIST_POS < 0);
+    undoBtn.title = HIST_POS >= 0
+      ? 'Undo: ' + HISTORY[HIST_POS].action
+      : 'Nothing to undo';
+  }
+  if(cntBadge){
+    if(available > 0){
+      cntBadge.textContent = available > 9 ? '9+' : available;
+      cntBadge.style.display = 'inline-flex';
+    } else {
+      cntBadge.style.display = 'none';
+    }
+  }
+}
+
+function renderHistoryPanel(){
+  const list = document.getElementById('hp-list');
+  if(!list) return;
+  if(HISTORY.length === 0){
+    list.innerHTML = '<div class="hp-empty">No changes recorded yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  // Render newest first
+  [...HISTORY].reverse().forEach((entry, ri)=>{
+    const realIdx = HISTORY.length - 1 - ri;
+    const isCurrent = realIdx === HIST_POS;
+    const isUndone  = realIdx > HIST_POS;
+    const item = document.createElement('div');
+    item.className = 'hp-item' + (isCurrent?' current':'') + (isUndone?' undone':'');
+    const canRedo = isUndone && entry.after;
+    item.innerHTML = `
+      <div class="hp-icon">${entry.icon}</div>
+      <div class="hp-info">
+        <div class="hp-action">${entry.action}</div>
+        <div class="hp-detail">${entry.detail}</div>
+        <div class="hp-actions">
+          ${!isUndone ? '<button class="hp-undo-btn" data-idx="'+realIdx+'">↩ Undo to here</button>' : ''}
+          ${canRedo   ? '<button class="hp-redo-btn" data-idx="'+realIdx+'">↪ Redo</button>' : ''}
+        </div>
+      </div>
+      <div class="hp-time">${entry.time}</div>`;
+    list.appendChild(item);
+  });
+
+  // Wire undo-to-here buttons
+  list.querySelectorAll('.hp-undo-btn[data-idx]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const targetIdx = parseInt(btn.dataset.idx);
+      // Undo back to just before targetIdx
+      if(targetIdx <= HIST_POS){
+        const entry = HISTORY[targetIdx];
+        ACTUALS    = JSON.parse(JSON.stringify(entry.before.actuals));
+        USER_SCHED = JSON.parse(JSON.stringify(entry.before.userSched));
+        saveActuals(); saveUserSched();
+        HIST_POS = targetIdx - 1;
+        updateUndoUI(); renderHistoryPanel();
+        renderTakt(); updateTopKPIs();
+        showToast('↩ Restored to before: ' + entry.action, 'info', 3000);
+      }
+    });
+  });
+  list.querySelectorAll('.hp-redo-btn[data-idx]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const targetIdx = parseInt(btn.dataset.idx);
+      if(targetIdx > HIST_POS && HISTORY[targetIdx]?.after){
+        ACTUALS    = JSON.parse(JSON.stringify(HISTORY[targetIdx].after.actuals));
+        USER_SCHED = JSON.parse(JSON.stringify(HISTORY[targetIdx].after.userSched));
+        saveActuals(); saveUserSched();
+        HIST_POS = targetIdx;
+        updateUndoUI(); renderHistoryPanel();
+        renderTakt(); updateTopKPIs();
+        showToast('↪ Redone: ' + HISTORY[targetIdx].action, 'info', 3000);
+      }
+    });
+  });
+}
+
+// Keyboard shortcuts: Ctrl+Z / Ctrl+Y
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==='z' && !e.shiftKey){
+    e.preventDefault(); doUndo();
+  }
+  if((e.ctrlKey||e.metaKey) && (e.key==='y' || (e.key==='z' && e.shiftKey))){
+    e.preventDefault(); doRedo();
+  }
+});
+
 // ── Mutable schedule overlay ──────────────────────────────────
 // USER_SCHED stores additions, deletions, and conversions on top of base SCHEDULE
 // Format: { added: {blk: [{unit,start,end,rowType,isAdded,isConverted,notes}]},
@@ -861,21 +1128,18 @@ function effectiveSchedule(){
 }
 
 // Add a new unit
-function addUnit(blk, unit, rowType, start, end, notes){
+function addUnit(blk, unit, rowType, start, end, notes, _skipHistory=false){
   if(!USER_SCHED.added[blk]) USER_SCHED.added[blk]=[];
-  // Remove any existing entry with same name (re-add)
   USER_SCHED.added[blk] = USER_SCHED.added[blk].filter(e=>e.unit!==unit);
   USER_SCHED.added[blk].push({unit, rowType, start, end, isAdded:true, notes:notes||''});
   saveUserSched();
 }
 
 // Delete a unit (add to deleted set)
-function deleteUnit(blk, unit){
+function deleteUnit(blk, unit, _skipHistory=false){
   const k = unitKey(blk, unit);
   if(!USER_SCHED.deleted.includes(k)) USER_SCHED.deleted.push(k);
-  // Also remove from added if it was a user-added unit
   if(USER_SCHED.added[blk]) USER_SCHED.added[blk]=USER_SCHED.added[blk].filter(e=>e.unit!==unit);
-  // Clear actuals for this unit
   for(const key of Object.keys(ACTUALS)){
     if(key.startsWith(blk+'|'+unit+'|')) delete ACTUALS[key];
   }
@@ -1162,9 +1426,16 @@ function renderTakt(){
     }
     rightEl.appendChild(bhr);
 
+    // Determine rowType from unit name prefix, not which array it came from.
+    // bd.mcwp may contain G-* gondola-after-MCP units mixed in from the base data.
+    function resolveRowType(unit, arrayType){
+      if(unit.startsWith('MCWP') || unit.startsWith('MCP-')) return 'mcwp';
+      if(unit.startsWith('G-')) return 'gond';
+      return arrayType; // fallback to array origin for user-added units
+    }
     const allRows=[
-      ...mcwpList.map(e=>({...e,rowType:'mcwp',bd})),
-      ...gondList.map(e=>({...e,rowType:'gond',bd}))
+      ...mcwpList.map(e=>({...e, rowType: resolveRowType(e.unit,'mcwp'), bd})),
+      ...gondList.map(e=>({...e, rowType: resolveRowType(e.unit,'gond'), bd}))
     ].sort((a,b)=>a.unit.localeCompare(b.unit));
 
     allRows.forEach(row=>{
@@ -1180,7 +1451,8 @@ function renderTakt(){
       const rac=document.createElement('div');rac.className='row-actions';
       // Convert button
       const convBtn=document.createElement('button');
-      if(row.rowType==='mcwp'){
+      const isMcwpUnit = row.rowType==='mcwp';
+      if(isMcwpUnit){
         convBtn.className='ra-btn conv-g';convBtn.title='Convert to Gondola';convBtn.textContent='⇄G';
         convBtn.addEventListener('click',e=>{e.stopPropagation();doConvert(blk,row,'mcwp','gond');});
       } else {
@@ -1230,7 +1502,7 @@ function renderTakt(){
       }
 
       // Activity chips — absolute bar spanning dates
-      const unitType = row.unit.startsWith('MCWP')?'mcwp':'gond';
+      const unitType = (row.unit.startsWith('MCWP')||row.unit.startsWith('MCP-'))?'mcwp':'gond';
       const acts = getActivities(row.bd, row.unit, row.start, row.end, unitType);
 
       acts.forEach(act=>{
@@ -1481,8 +1753,12 @@ document.getElementById('m-save').addEventListener('click',()=>{
   const {blk,row,act}=modalCtx;
   const key=`${blk}|${row.unit}|${act.id}`;
   const selTags=[...document.querySelectorAll('.dtag.sel')].map(t=>t.dataset.code);
+  const newStatus=document.getElementById('m-stat').value;
+  const actionLabel = `Update ${act.name} — ${row.unit} (${blk})`;
+  const detail = `Status: ${newStatus} | ${parseInt(document.getElementById('m-pct').value)||0}% complete`;
+  beginAction(actionLabel, detail, '📝');
   ACTUALS[key]={
-    status:document.getElementById('m-stat').value,
+    status:newStatus,
     pct:parseInt(document.getElementById('m-pct').value)||0,
     actualStart:document.getElementById('m-as').value,
     actualEnd:document.getElementById('m-ae').value,
@@ -1491,6 +1767,7 @@ document.getElementById('m-save').addEventListener('click',()=>{
     savedAt:new Date().toISOString(),
   };
   saveActuals();
+  commitAction();
   document.getElementById('modal-overlay').classList.remove('open');
   renderTakt();
   updateTopKPIs();
@@ -1506,7 +1783,10 @@ document.getElementById('m-save').addEventListener('click',()=>{
 function getAllUnits(){
   const all=[];
   for(const [blk,bd] of Object.entries(effectiveSchedule())){
-    for(const e of bd.mcwp) all.push({blk,bd,entry:e,type:'mcwp'});
+    for(const e of bd.mcwp){
+      const t=(e.unit.startsWith('MCWP')||e.unit.startsWith('MCP-'))?'mcwp':'gond';
+      all.push({blk,bd,entry:e,type:t});
+    }
     for(const e of bd.gondola) all.push({blk,bd,entry:e,type:'gond'});
   }
   return all;
@@ -1843,6 +2123,23 @@ document.getElementById('zoom-next').addEventListener('click',()=>{
 document.getElementById('today-lbl').textContent=TODAY.toLocaleDateString('en-SG',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
 renderTakt();
 updateTopKPIs();
+updateUndoUI();
+
+// ── History panel wiring ──────────────────────────────────────────────────────
+document.getElementById('btn-undo').addEventListener('click', doUndo);
+document.getElementById('btn-history').addEventListener('click', ()=>{
+  document.getElementById('history-panel').classList.toggle('open');
+  renderHistoryPanel();
+});
+document.getElementById('hp-close').addEventListener('click', ()=>{
+  document.getElementById('history-panel').classList.remove('open');
+});
+document.getElementById('hp-undo-all').addEventListener('click', doUndo);
+document.getElementById('hp-clear-history').addEventListener('click', ()=>{
+  HISTORY=[]; HIST_POS=-1;
+  updateUndoUI(); renderHistoryPanel();
+  showToast('History cleared','info');
+});
 
 }); // end DOMContentLoaded
 
@@ -2036,6 +2333,7 @@ function importFromExcel(file){
         showToast('Invalid file format — missing required columns','err'); return;
       }
 
+      beginAction('Import XLSX', `${rows.length-1} rows processed`, '⬆');
       let imported=0, skipped=0;
       rows.slice(1).forEach(row=>{
         const blk=String(row[cBlk]||'').trim();
@@ -2068,12 +2366,12 @@ function importFromExcel(file){
         }
       });
 
+      // Wrap the import as a single undoable action
+      commitAction();
       saveActuals();
       renderTakt();
       updateTopKPIs();
-      // Re-render dashboard if visible
       if(!document.getElementById('dashboard-view').classList.contains('hidden')) renderDashboard();
-
       showToast(`✓ Imported ${imported} records (${skipped} skipped)`, 'ok', 4000);
     } catch(err){
       console.error(err);
@@ -2156,8 +2454,9 @@ document.getElementById('am-save').addEventListener('click', ()=>{
   if(!start||!end){ showToast('Start and End dates are required','err'); return; }
   if(start > end){ showToast('End date must be after Start date','err'); return; }
 
+  const _amActionLabel = addModalMode==='edit' ? `Edit Unit — ${document.getElementById('am-unit').value} (${document.getElementById('am-block').value})` : `Add Unit — ${document.getElementById('am-unit').value} to ${document.getElementById('am-block').value}`;
+  beginAction(_amActionLabel, document.getElementById('am-notes').value || 'No notes', addModalMode==='edit'?'✎':'➕');
   if(addModalMode === 'edit' && editCtx){
-    // Update the existing user-added entry
     const {blk:eb, row} = editCtx;
     const added = USER_SCHED.added[eb] || [];
     const idx = added.findIndex(e=>e.unit===row.unit);
@@ -2186,6 +2485,7 @@ document.getElementById('am-save').addEventListener('click', ()=>{
     showToast('Unit '+unit+' added to '+blk, 'ok');
   }
 
+  commitAction();
   closeAddModal();
   renderTakt();
   updateTopKPIs();
@@ -2207,7 +2507,9 @@ document.getElementById('cb-cancel').addEventListener('click',()=>{
 });
 document.getElementById('cb-confirm').addEventListener('click',()=>{
   if(pendingDelete){
+    beginAction(`Delete Unit — ${pendingDelete.unit}`, `Block ${pendingDelete.blk}`, '🗑');
     deleteUnit(pendingDelete.blk, pendingDelete.unit);
+    commitAction();
     showToast('Unit "'+pendingDelete.unit+'" deleted','ok');
     pendingDelete=null;
     document.getElementById('confirm-overlay').classList.remove('open');
@@ -2219,7 +2521,9 @@ document.getElementById('cb-confirm').addEventListener('click',()=>{
 // ── Convert unit ─────────────────────────────────────────────
 function doConvert(blk, row, fromType, toType){
   const label = toType==='gond' ? 'Gondola' : 'MCWP';
+  beginAction(`Convert ${row.unit} → ${label}`, `Block ${blk} | ${row.start} to ${row.end}`, '⇄');
   const newName = convertUnit(blk, row.unit, fromType, toType, row);
+  commitAction();
   showToast(row.unit+' converted to '+label+' as '+newName, 'ok', 4000);
   renderTakt();
   updateTopKPIs();
