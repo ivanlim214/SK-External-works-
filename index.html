@@ -800,8 +800,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <label>Type</label>
         <select id="am-type">
           <option value="mcwp">MCWP (Mast Climbing Work Platform)</option>
-          <option value="gond">Gondola</option>
+          <option value="gond_after">Gondola After MCP (10-day cycle)</option>
+          <option value="gond">Gondola Only (20-day cycle)</option>
         </select>
+        <div id="am-type-hint" style="margin-top:5px;font-size:10px;font-family:var(--mono);color:var(--text3);padding:4px 8px;border-radius:4px;background:var(--bg4)"></div>
       </div>
       <div class="am-row2">
         <div class="am-field">
@@ -1120,7 +1122,7 @@ function effectiveSchedule(){
       ],
       gondola: [
         ...bd.gondola.filter(e => !deleted.has(unitKey(blk, e.unit))),
-        ...added.filter(e => e.rowType==='gond')
+        ...added.filter(e => e.rowType==='gond' || e.rowType==='gond_after')
       ],
     };
   }
@@ -1147,15 +1149,15 @@ function deleteUnit(blk, unit, _skipHistory=false){
 }
 
 // Convert a unit from mcwp→gond or gond→mcwp
-function convertUnit(blk, unit, fromType, toType, entry){
-  // Delete original
+function convertUnit(blk, unit, fromType, toType, entry, gondSubtype){
   deleteUnit(blk, unit);
-  // Re-add as new type with new unit name
-  const newName = toType==='gond'
-    ? unit.replace('MCWP-','G-').replace('MCP-','G-')
-    : unit.replace(/^G-/,'MCWP-');
-  const notes = `Converted from ${fromType.toUpperCase()} to ${toType.toUpperCase()} (site constraint)`;
-  addUnit(blk, newName, toType, entry.start, entry.end, notes);
+  const newName = toType==='mcwp'
+    ? unit.replace(/^G-/,'MCWP-')
+    : unit.replace('MCWP-','G-').replace('MCP-','G-');
+  const effectiveType = toType==='gond' ? (gondSubtype||'gond_after') : toType;
+  const cycleLabel = effectiveType==='gond_after'?'Gondola After MCP (10d)':effectiveType==='gond'?'Gondola Only (20d)':'MCWP';
+  const notes = `Converted from ${fromType.toUpperCase()} to ${cycleLabel} (site constraint)`;
+  addUnit(blk, newName, effectiveType, entry.start, entry.end, notes);
   // Migrate actuals to new unit name
   for(const key of Object.keys(ACTUALS)){
     if(key.startsWith(blk+'|'+unit+'|')){
@@ -1169,7 +1171,9 @@ function convertUnit(blk, unit, fromType, toType, entry){
 }
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
-const TODAY = new Date('2026-05-21');
+// Always use the real current date — never hardcoded
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
 function pd(s){const[y,m,d]=s.split('-');return new Date(+y,+m-1,+d);}
 function ds(d){return d.toISOString().slice(0,10);}
 function fmt(d){return d.toLocaleDateString('en-SG',{day:'2-digit',month:'short',year:'numeric'});}
@@ -1279,7 +1283,11 @@ function dateToPx(date, cols){
 
 // ── Build activity list for a unit ───────────────────────────────────────────
 function getActivities(block, unit, startStr, endStr, unitType){
-  const cycle = unitType==='mcwp' ? MCP_CYCLE : (block.gondola&&block.gondola.find(g=>g.unit===unit) ? GOND_ONLY_CYCLE : GOND_AFTER_CYCLE);
+  let cycle;
+  if(unitType==='mcwp') cycle=MCP_CYCLE;
+  else if(unitType==='gond_after') cycle=GOND_AFTER_CYCLE;
+  else if(unitType==='gond') cycle=GOND_ONLY_CYCLE;
+  else cycle=(block.gondola&&block.gondola.find(g=>g.unit===unit))?GOND_ONLY_CYCLE:GOND_AFTER_CYCLE;
   const totalCycleDays = cycle.reduce((s,a)=>s+a.dur,0);
   const start = pd(startStr), end = pd(endStr);
   const totalAvail = diffDays(start,end)+1;
@@ -1431,7 +1439,8 @@ function renderTakt(){
     function resolveRowType(unit, arrayType){
       if(unit.startsWith('MCWP') || unit.startsWith('MCP-')) return 'mcwp';
       if(unit.startsWith('G-')) return 'gond';
-      return arrayType; // fallback to array origin for user-added units
+      if(arrayType==='gond_after') return 'gond';
+      return arrayType;
     }
     const allRows=[
       ...mcwpList.map(e=>({...e, rowType: resolveRowType(e.unit,'mcwp'), bd})),
@@ -1502,7 +1511,10 @@ function renderTakt(){
       }
 
       // Activity chips — absolute bar spanning dates
-      const unitType = (row.unit.startsWith('MCWP')||row.unit.startsWith('MCP-'))?'mcwp':'gond';
+      let unitType;
+      if(row.rowType==='mcwp') unitType='mcwp';
+      else if(row.rowType==='gond_after') unitType='gond_after';
+      else unitType='gond';
       const acts = getActivities(row.bd, row.unit, row.start, row.end, unitType);
 
       acts.forEach(act=>{
@@ -2030,9 +2042,9 @@ function renderEquipmentTable(){
 
 // ── Cycle view ────────────────────────────────────────────────────────────────
 const CYCLE_DEFS=[
-  {title:'MCWP CYCLE',sub:'Mast Climbing Work Platform',total:26,items:MCP_CYCLE},
-  {title:'GONDOLA (After MCP)',sub:'Accessible after MCP completion',total:10,items:GOND_AFTER_CYCLE},
-  {title:'GONDOLA ONLY',sub:'No MCP access — full sequence',total:20,items:GOND_ONLY_CYCLE},
+  {title:'MCWP CYCLE',sub:'Mast Climbing Work Platform — type: MCWP (26d)',total:26,items:MCP_CYCLE},
+  {title:'GONDOLA AFTER MCP',sub:'Accessible after MCP completes — type: Gondola After MCP (10d)',total:10,items:GOND_AFTER_CYCLE},
+  {title:'GONDOLA ONLY',sub:'No MCP access, full facade — type: Gondola Only (20d)',total:20,items:GOND_ONLY_CYCLE},
 ];
 function renderCycles(){
   const g=document.getElementById('cyc-grid');g.innerHTML='';
@@ -2392,8 +2404,9 @@ document.getElementById('import-input').addEventListener('change', function(){
 // ADD / EDIT / DELETE / CONVERT UNIT LOGIC
 // ══════════════════════════════════════════════════════
 
-let addModalMode = 'add';  // 'add' | 'edit'
+let addModalMode = 'add';  // 'add' | 'edit' | 'convert'
 let editCtx = null;        // {blk, row} when editing
+let convertCtx = null;     // {blk, row, fromType} when converting
 
 function openAddModal(blk){
   addModalMode = 'add';
@@ -2406,6 +2419,7 @@ function openAddModal(blk){
   document.getElementById('am-end').value = '';
   document.getElementById('am-notes').value = '';
   document.getElementById('am-save').textContent = 'Add Unit ✓';
+  if(typeof updateTypeHint==='function') updateTypeHint();
   document.getElementById('add-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('am-unit').focus(),100);
 }
@@ -2453,6 +2467,21 @@ document.getElementById('am-save').addEventListener('click', ()=>{
   if(!unit){ showToast('Unit name is required','err'); return; }
   if(!start||!end){ showToast('Start and End dates are required','err'); return; }
   if(start > end){ showToast('End date must be after Start date','err'); return; }
+
+  if(addModalMode === 'convert' && convertCtx){
+    const {blk:cb, row:cr, fromType:cf} = convertCtx;
+    const cycleLabel = type==='gond_after'?'Gondola After MCP (10d)':type==='gond'?'Gondola Only (20d)':'MCWP';
+    beginAction(`Convert ${cr.unit} → ${cycleLabel}`, `Block ${cb} | ${notes||'site constraint'}`, '⇄');
+    const newName = convertUnit(cb, cr.unit, cf, type==='mcwp'?'mcwp':'gond', cr, type);
+    commitAction();
+    const mcwpOpt = document.querySelector('#am-type option[value="mcwp"]');
+    if(mcwpOpt) mcwpOpt.disabled = false;
+    showToast(`${cr.unit} converted as ${newName}`, 'ok', 4000);
+    convertCtx=null;
+    closeAddModal();
+    renderTakt(); updateTopKPIs();
+    return;
+  }
 
   const _amActionLabel = addModalMode==='edit' ? `Edit Unit — ${document.getElementById('am-unit').value} (${document.getElementById('am-block').value})` : `Add Unit — ${document.getElementById('am-unit').value} to ${document.getElementById('am-block').value}`;
   beginAction(_amActionLabel, document.getElementById('am-notes').value || 'No notes', addModalMode==='edit'?'✎':'➕');
@@ -2520,25 +2549,54 @@ document.getElementById('cb-confirm').addEventListener('click',()=>{
 
 // ── Convert unit ─────────────────────────────────────────────
 function doConvert(blk, row, fromType, toType){
-  const label = toType==='gond' ? 'Gondola' : 'MCWP';
-  beginAction(`Convert ${row.unit} → ${label}`, `Block ${blk} | ${row.start} to ${row.end}`, '⇄');
-  const newName = convertUnit(blk, row.unit, fromType, toType, row);
-  commitAction();
-  showToast(row.unit+' converted to '+label+' as '+newName, 'ok', 4000);
-  renderTakt();
-  updateTopKPIs();
+  if(toType==='gond'){
+    openConvertTypeModal(blk, row, fromType);
+  } else {
+    beginAction(`Convert ${row.unit} → MCWP`, `Block ${blk} | ${row.start} to ${row.end}`, '⇄');
+    const newName = convertUnit(blk, row.unit, fromType, toType, row, null);
+    commitAction();
+    showToast(row.unit+' converted to MCWP as '+newName, 'ok', 4000);
+    renderTakt(); updateTopKPIs();
+  }
+}
+
+function openConvertTypeModal(blk, row, fromType){
+  document.getElementById('am-title').textContent = 'Convert ' + row.unit + ' → Gondola';
+  document.getElementById('am-block').value = blk;
+  document.getElementById('am-block').disabled = true;
+  document.getElementById('am-unit').value = row.unit.replace('MCWP-','G-').replace('MCP-','G-');
+  document.getElementById('am-unit').disabled = true;
+  document.getElementById('am-type').value = 'gond_after';
+  const mcwpOpt = document.querySelector('#am-type option[value="mcwp"]');
+  if(mcwpOpt) mcwpOpt.disabled = true;
+  document.getElementById('am-start').value = row.start||'';
+  document.getElementById('am-end').value = row.end||'';
+  document.getElementById('am-notes').value = 'Converted from MCWP due to site constraint';
+  document.getElementById('am-save').textContent = 'Convert ⇄';
+  addModalMode='convert'; convertCtx={blk,row,fromType};
+  if(typeof updateTypeHint==='function') updateTypeHint();
+  document.getElementById('add-overlay').classList.add('open');
 }
 
 // ── Auto-suggest unit name based on block + type ─────────────
+function updateTypeHint(){
+  const hints={
+    mcwp:       '📐 26-day cycle · MCP Install → RC Wall → Skimming → Painting → Dismantle',
+    gond_after: '🏗 10-day cycle · G Install → Skim T/U → Final Painting → Win Removal → Dismantle',
+    gond:       '🔧 20-day cycle · G Install → RC Wall → Skimming → Painting → Dismantle',
+  };
+  const el=document.getElementById('am-type-hint');
+  if(el) el.textContent = hints[document.getElementById('am-type').value]||'';
+}
 document.getElementById('am-type').addEventListener('change', function(){
   const unit = document.getElementById('am-unit').value.trim();
-  if(!unit) return;  // don't overwrite if user typed something
-  // Suggest prefix
-  if(this.value==='mcwp' && unit.startsWith('G-')){
-    document.getElementById('am-unit').value = unit.replace('G-','MCWP-');
-  } else if(this.value==='gond' && unit.startsWith('MCWP-')){
-    document.getElementById('am-unit').value = unit.replace('MCWP-','G-');
+  if(unit){
+    if(this.value==='mcwp' && unit.startsWith('G-'))
+      document.getElementById('am-unit').value = unit.replace('G-','MCWP-');
+    else if((this.value==='gond'||this.value==='gond_after') && unit.startsWith('MCWP-'))
+      document.getElementById('am-unit').value = unit.replace('MCWP-','G-');
   }
+  updateTypeHint();
 });
 
 </script>
