@@ -5,11 +5,11 @@
 <title>SKN4C49 — Takt Plan: MCWP & Gondola Tracker</title>
 <style>
   :root{
-    --bg:#0f1419; --panel:#161d27; --panel2:#1c2530; --panel3:#202b38; --border:#2a3441;
-    --text:#e8edf3; --text-dim:#8a96a3; --accent:#4da3ff;
-    --mcwp:#3b82f6; --mcwp-light:#93c5fd; --gondola:#ec4899; --gondola-light:#f9a8d4;
-    --today:#22c55e; --cursor:#f59e0b;
-    --st-notstarted:#5b6675; --st-inprogress:#f59e0b; --st-done:#22c55e; --st-delayed:#ef4444;
+    --bg:#f0f2f6; --panel:#ffffff; --panel2:#f4f6f9; --panel3:#eaecf0; --border:#d0d5de;
+    --text:#1a2332; --text-dim:#64748b; --accent:#2563eb;
+    --mcwp:#2563eb; --mcwp-light:#1e40af; --gondola:#db2777; --gondola-light:#9d174d;
+    --today:#16a34a; --cursor:#d97706;
+    --st-notstarted:#94a3b8; --st-inprogress:#d97706; --st-done:#16a34a; --st-delayed:#dc2626;
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);}
@@ -70,8 +70,8 @@
   .ganttlayout{display:flex;align-items:flex-start;}
   .ganttlabelcol{width:76px;flex-shrink:0;background:var(--panel2);border-right:1px solid var(--border);position:sticky;left:0;z-index:6;}
   .llheader{height:44px;border-bottom:1px solid var(--border);}
-  .llsechead{height:28px;padding:0 5px;background:#141a23;border-bottom:1px solid var(--border);font-size:8px;text-transform:uppercase;color:var(--text-dim);font-weight:700;display:flex;align-items:center;overflow:hidden;white-space:nowrap;}
-  .llitem{height:30px;display:flex;align-items:center;padding:0 6px;border-bottom:1px solid #1d2630;font-size:10px;font-weight:800;letter-spacing:.2px;white-space:nowrap;overflow:hidden;cursor:pointer;}
+  .llsechead{height:28px;padding:0 5px;background:#e8edf4;border-bottom:1px solid var(--border);font-size:8px;text-transform:uppercase;color:var(--text-dim);font-weight:700;display:flex;align-items:center;overflow:hidden;white-space:nowrap;}
+  .llitem{height:30px;display:flex;align-items:center;padding:0 6px;border-bottom:1px solid #e4e8ef;font-size:10px;font-weight:800;letter-spacing:.2px;white-space:nowrap;overflow:hidden;cursor:pointer;}
   .llitem.mcwp{color:var(--mcwp-light);}
   .llitem.gondola{color:var(--gondola-light);}
   .llitem.cursoractive{color:var(--cursor)!important;background:rgba(245,158,11,.09);}
@@ -82,13 +82,13 @@
   .tick{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:10.5px;color:var(--text-dim);border-left:1px solid var(--border);padding-left:4px;white-space:nowrap;}
   .tickrow.major .tick{font-size:11px;color:var(--text);font-weight:600;}
   .section{border-bottom:1px solid var(--border);}
-  .sectionhead{padding:0 10px;background:#141a23;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);font-weight:700;height:28px;display:flex;align-items:center;overflow:hidden;}
-  .lane{position:relative;height:30px;border-bottom:1px solid #1d2630;cursor:pointer;overflow:hidden;}
+  .sectionhead{padding:0 10px;background:#e8edf4;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);font-weight:700;height:28px;display:flex;align-items:center;overflow:hidden;}
+  .lane{position:relative;height:30px;border-bottom:1px solid #e4e8ef;cursor:pointer;overflow:hidden;}
   .lane:hover{background:rgba(255,255,255,.025);}
   .lane.cursoractive{background:rgba(245,158,11,.06);}
   .zonebg{position:absolute;top:0;bottom:0;opacity:.09;pointer-events:none;z-index:0;}
-  .zonebg.mcwp{background:var(--mcwp);}
-  .zonebg.gondola{background:var(--gondola);}
+  .zonebg.mcwp{background:#2563eb;}
+  .zonebg.gondola{background:#db2777;}
   @keyframes pulseRed{0%,100%{opacity:1;}50%{opacity:.45;}}
   @keyframes stripeMove{from{background-position:0 0;}to{background-position:14px 0;}}
   .seg{position:absolute;top:5px;height:20px;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.5);overflow:hidden;border:2px solid transparent;}
@@ -97,10 +97,10 @@
   .seg.st-done{border-color:var(--st-done);}
   .seg.st-delayed{border-color:var(--st-delayed);}
   .segoverlay{position:absolute;inset:0;pointer-events:none;}
-  .segoverlay.notstarted{background:rgba(13,17,22,.62);}
-  .segoverlay.inprogress{background-image:repeating-linear-gradient(45deg, rgba(255,255,255,.42) 0 5px, transparent 5px 10px);background-size:14px 14px;animation:stripeMove .9s linear infinite;}
-  .segoverlay.done{background:rgba(255,255,255,.10);}
-  .segoverlay.delayed{background-image:repeating-linear-gradient(45deg, rgba(127,0,0,.5) 0 5px, rgba(0,0,0,.35) 5px 10px);}
+  .segoverlay.notstarted{background:rgba(255,255,255,.55);}
+  .segoverlay.inprogress{background-image:repeating-linear-gradient(45deg, rgba(0,0,0,.15) 0 5px, transparent 5px 10px);background-size:14px 14px;animation:stripeMove .9s linear infinite;}
+  .segoverlay.done{background:rgba(0,0,0,.08);}
+  .segoverlay.delayed{background-image:repeating-linear-gradient(45deg, rgba(220,38,38,.4) 0 5px, rgba(255,255,255,.3) 5px 10px);}
   .segicon{position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9);pointer-events:none;z-index:2;}
   .cursorline{position:absolute;top:0;bottom:0;width:2px;background:var(--cursor);z-index:6;pointer-events:none;}
   .cursorflag{position:absolute;top:-1px;left:-26px;background:var(--cursor);color:#1a1200;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;z-index:7;}
@@ -116,7 +116,7 @@
   ::-webkit-scrollbar-thumb{background:#2a3441;border-radius:5px;}
   ::-webkit-scrollbar-track{background:var(--panel);}
 
-  .overlay{position:fixed;inset:0;background:rgba(5,8,12,.65);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:40px 20px;overflow-y:auto;}
+  .overlay{position:fixed;inset:0;background:rgba(30,41,59,.45);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:40px 20px;overflow-y:auto;}
   .overlay.open{display:flex;}
   .modal{background:var(--panel);border:1px solid var(--border);border-radius:12px;width:100%;max-width:880px;overflow:hidden;}
   .modalhead{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--panel2);}
@@ -132,7 +132,7 @@
   .applybtn{background:var(--accent);color:#06121f;border:none;padding:8px 16px;border-radius:6px;font-weight:700;font-size:12.5px;cursor:pointer;height:34px;}
   table.tasks{width:100%;border-collapse:collapse;font-size:12.5px;}
   table.tasks th{text-align:left;color:var(--text-dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;border-bottom:1px solid var(--border);}
-  table.tasks td{padding:6px 8px;border-bottom:1px solid #1d2630;vertical-align:middle;}
+  table.tasks td{padding:6px 8px;border-bottom:1px solid #e4e8ef;vertical-align:middle;}
   table.tasks tr:hover td{background:var(--panel2);}
   table.tasks input[type=date]{background:var(--panel3);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:5px;font-size:12px;width:128px;}
   table.tasks select{background:var(--panel3);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:5px;font-size:12px;}
@@ -168,7 +168,7 @@
   .mapchiprow{display:flex;flex-wrap:wrap;gap:4px;}
   .verifytable{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:20px;}
   .verifytable th{text-align:left;color:var(--text-dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:2px solid var(--border);background:var(--panel2);}
-  .verifytable td{padding:6px 10px;border-bottom:1px solid #1d2630;vertical-align:top;}
+  .verifytable td{padding:6px 10px;border-bottom:1px solid #e4e8ef;vertical-align:top;}
   .verifytable tr.ok td{background:rgba(34,197,94,.05);}
   .verifytable tr.warn td{background:rgba(245,158,11,.07);}
   .verifytable tr.err td{background:rgba(239,68,68,.08);}
@@ -180,6 +180,7 @@
   .vcardhead{padding:12px 16px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
   .vcardhead h3{margin:0;font-size:14px;}
   .verifyzonelist{font-size:11.5px;color:var(--text-dim);word-break:break-all;}
+  .verifyintro{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:18px;}
   .statcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
   .statcard .num{font-size:28px;font-weight:800;line-height:1.1;}
   .statcard .lbl{font-size:11.5px;color:var(--text-dim);margin-top:5px;text-transform:uppercase;letter-spacing:.4px;}
@@ -236,18 +237,18 @@
   .lpscardhead .cnt{margin-left:auto;font-size:11.5px;color:var(--text-dim);}
   table.lpstable{width:100%;border-collapse:collapse;font-size:12.5px;}
   table.lpstable th{text-align:left;color:var(--text-dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--panel2);}
-  table.lpstable td{padding:7px 14px;border-bottom:1px solid #1d2630;}
+  table.lpstable td{padding:7px 14px;border-bottom:1px solid #e4e8ef;}
   table.lpstable tr.lpsrow{cursor:pointer;}
   table.lpstable tr.lpsrow:hover td{background:var(--panel2);}
   .lpsempty{padding:14px 18px;color:var(--text-dim);font-size:12.5px;font-style:italic;}
   .causeselect{background:var(--panel3);border:1px solid var(--border);color:var(--text);padding:4px 6px;border-radius:5px;font-size:12px;}
   .causeselect:disabled{opacity:.35;cursor:not-allowed;}
 
-  .openbanner{background:#3a2a0f;border-bottom:1px solid #5a4318;color:#fde8b8;font-size:12.5px;padding:9px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  .openbanner b{color:#ffd479;}
+  .openbanner{background:#fffbeb;border-bottom:1px solid #fbbf24;color:#92400e;font-size:12.5px;padding:9px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .openbanner b{color:#92400e;font-weight:700;}
   .openbanner button{margin-left:auto;background:none;border:1px solid #5a4318;color:#fde8b8;border-radius:6px;padding:4px 10px;font-size:11.5px;cursor:pointer;}
   .toaststack{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:100;}
-  .toast{background:var(--panel2);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:11px 16px;font-size:12.5px;max-width:340px;box-shadow:0 4px 18px rgba(0,0,0,.5);}
+  .toast{background:#fff;border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:11px 16px;font-size:12.5px;max-width:340px;box-shadow:0 2px 12px rgba(0,0,0,.12);}
   .toast.ok{border-left-color:var(--st-done);}
   .toast.warn{border-left-color:var(--st-delayed);}
 
@@ -260,7 +261,7 @@
   .psummarytable th,.psummarytable td{border:1px solid #ccc;padding:6px 9px;text-align:left;}
   .psummarytable th{background:#222;color:#fff;}
   .pmapimg{max-width:100%;border:1px solid #ccc;margin-top:8px;}
-  .pganttwrap{margin-top:10px;border:1px solid #ccc;background:#161d27;padding:6px;overflow:visible;}
+  .pganttwrap{margin-top:10px;border:1px solid #ccc;background:#f8fafc;padding:6px;overflow:visible;}
   .plegend{display:flex;gap:14px;font-size:10.5px;color:#444;margin-top:8px;flex-wrap:wrap;}
   .plegend span{display:inline-flex;align-items:center;gap:5px;}
   @media print{
@@ -929,112 +930,160 @@ function updateMapsTimeline(){
   });
 }
 
+const GROUND_TRUTH = {"419A": [{"title": "MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "mcwp", "rows": [{"sn": 1, "zone": "MCWP-A1", "start": "2026-04-15", "end": "2026-05-23", "ref": false, "row": 9}, {"sn": 2, "zone": "MCWP-A2", "start": "2026-05-25", "end": "2026-06-25", "ref": false, "row": 10}, {"sn": 3, "zone": "MCWP-A3", "start": "2026-06-26", "end": "2026-07-25", "ref": false, "row": 11}, {"sn": 5, "zone": "MCWP-B1", "start": "2026-05-20", "end": "2026-06-20", "ref": false, "row": 12}, {"sn": 6, "zone": "MCWP-B2", "start": "2026-06-22", "end": "2026-07-21", "ref": false, "row": 13}, {"sn": 7, "zone": "MCWP-B3", "start": "2026-07-22", "end": "2026-08-21", "ref": false, "row": 14}, {"sn": 9, "zone": "MCWP-C1", "start": "2026-06-02", "end": "2026-07-02", "ref": false, "row": 15}, {"sn": 10, "zone": "MCWP-C2", "start": "2026-07-02", "end": "2026-07-31", "ref": false, "row": 16}, {"sn": 11, "zone": "MCWP-D1", "start": "2026-07-22", "end": "2026-08-21", "ref": false, "row": 17}], "refSkipped": []}], "419B": [{"title": "MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "mcwp", "rows": [{"sn": 1, "zone": "MCWP-A1", "start": "2026-06-17", "end": "2026-07-18", "ref": false, "row": 9}, {"sn": 2, "zone": "MCWP-A2", "start": "2026-07-20", "end": "2026-08-21", "ref": false, "row": 10}, {"sn": 3, "zone": "MCWP-A3", "start": "2026-08-22", "end": "2026-09-23", "ref": false, "row": 11}, {"sn": 4, "zone": "MCWP-B1", "start": "2026-06-24", "end": "2026-07-25", "ref": false, "row": 12}, {"sn": 5, "zone": "MCWP-B2", "start": "2026-07-27", "end": "2026-08-28", "ref": false, "row": 13}, {"sn": 6, "zone": "MCWP-C1", "start": "2026-06-29", "end": "2026-07-30", "ref": false, "row": 14}, {"sn": 7, "zone": "MCWP-C2", "start": "2026-07-31", "end": "2026-09-02", "ref": false, "row": 15}, {"sn": 8, "zone": "MCWP-D1", "start": "2026-07-07", "end": "2026-08-07", "ref": false, "row": 16}, {"sn": 9, "zone": "MCWP-D2", "start": "2026-08-08", "end": "2026-09-10", "ref": false, "row": 17}], "refSkipped": []}, {"title": "GONDOLA AFTER MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "gondolaAfter", "rows": [{"sn": 1, "zone": "G-F1", "start": "2026-07-19", "end": "2026-07-29", "ref": false, "row": 26}, {"sn": 2, "zone": "G-F2", "start": "2026-08-22", "end": "2026-09-01", "ref": false, "row": 27}, {"sn": 3, "zone": "G-F3", "start": "2026-09-24", "end": "2026-10-04", "ref": false, "row": 28}, {"sn": 4, "zone": "G-F4", "start": "2026-07-26", "end": "2026-08-05", "ref": false, "row": 29}, {"sn": 5, "zone": "G-G1", "start": "2026-08-29", "end": "2026-09-08", "ref": false, "row": 30}, {"sn": 6, "zone": "G-G2", "start": "2026-07-31", "end": "2026-08-10", "ref": false, "row": 31}, {"sn": 7, "zone": "G-G3", "start": "2026-09-03", "end": "2026-09-13", "ref": false, "row": 32}, {"sn": 8, "zone": "G-G4", "start": "2026-08-08", "end": "2026-08-18", "ref": false, "row": 33}, {"sn": 9, "zone": "G-H1", "start": "2026-09-11", "end": "2026-09-21", "ref": false, "row": 34}], "refSkipped": ["G-H2", "G-H3", "G-I1", "G-I2", "G-I3"]}, {"title": "GONDOLA WORK SCHEDULE", "cycleKey": "gondolaDirect", "rows": [{"sn": 1, "zone": "G-A1", "start": "2026-06-04", "end": "2026-07-01", "ref": false, "row": 45}, {"sn": 2, "zone": "G-A2", "start": "2026-07-02", "end": "2026-07-29", "ref": false, "row": 46}, {"sn": 3, "zone": "G-A3", "start": "2026-07-30", "end": "2026-08-27", "ref": false, "row": 47}, {"sn": 4, "zone": "G-A4", "start": "2026-08-28", "end": "2026-09-24", "ref": false, "row": 48}, {"sn": 5, "zone": "G-B1", "start": "2026-06-06", "end": "2026-07-03", "ref": false, "row": 49}, {"sn": 6, "zone": "G-B2", "start": "2026-07-04", "end": "2026-07-31", "ref": false, "row": 50}, {"sn": 7, "zone": "G-B3", "start": "2026-08-01", "end": "2026-08-29", "ref": false, "row": 51}, {"sn": 8, "zone": "G-B4", "start": "2026-08-31", "end": "2026-09-26", "ref": false, "row": 52}, {"sn": 9, "zone": "G-C1", "start": "2026-06-29", "end": "2026-07-25", "ref": false, "row": 53}, {"sn": 10, "zone": "G-C2", "start": "2026-07-27", "end": "2026-08-24", "ref": false, "row": 54}, {"sn": 11, "zone": "G-C3", "start": "2026-08-25", "end": "2026-09-21", "ref": false, "row": 55}, {"sn": 12, "zone": "G-C4", "start": "2026-09-22", "end": "2026-10-19", "ref": false, "row": 56}, {"sn": 13, "zone": "G-D1", "start": "2026-06-30", "end": "2026-07-27", "ref": false, "row": 57}, {"sn": 14, "zone": "G-D2", "start": "2026-07-28", "end": "2026-08-25", "ref": false, "row": 58}, {"sn": 15, "zone": "G-D3", "start": "2026-08-26", "end": "2026-09-22", "ref": false, "row": 59}, {"sn": 16, "zone": "G-D4", "start": "2026-09-23", "end": "2026-10-20", "ref": false, "row": 60}, {"sn": 17, "zone": "G-E1", "start": "2026-07-06", "end": "2026-08-01", "ref": false, "row": 61}, {"sn": 18, "zone": "G-E2", "start": "2026-08-03", "end": "2026-08-31", "ref": false, "row": 62}, {"sn": 19, "zone": "G-E3", "start": "2026-09-01", "end": "2026-09-28", "ref": false, "row": 63}, {"sn": 20, "zone": "G-F1", "start": "2026-07-07", "end": "2026-08-03", "ref": false, "row": 64}, {"sn": 21, "zone": "G-F2", "start": "2026-08-04", "end": "2026-09-01", "ref": false, "row": 65}, {"sn": 22, "zone": "G-F3", "start": "2026-09-02", "end": "2026-09-29", "ref": false, "row": 66}, {"sn": 23, "zone": "G-H1", "start": "2026-08-03", "end": "2026-08-29", "ref": false, "row": 67}, {"sn": 24, "zone": "G-H2", "start": "2026-09-01", "end": "2026-09-26", "ref": false, "row": 68}, {"sn": 25, "zone": "G-H3", "start": "2026-09-28", "end": "2026-10-24", "ref": false, "row": 69}], "refSkipped": []}], "419C": [{"title": "MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "mcwp", "rows": [{"sn": 1, "zone": "MCWP-A1", "start": "2026-06-08", "end": "2026-07-07", "ref": false, "row": 9}, {"sn": 2, "zone": "MCWP-A2", "start": "2026-07-08", "end": "2026-08-06", "ref": false, "row": 10}, {"sn": 3, "zone": "MCWP-A3", "start": "2026-08-07", "end": "2026-09-05", "ref": false, "row": 11}, {"sn": 4, "zone": "MCWP-B1", "start": "2026-06-10", "end": "2026-07-09", "ref": false, "row": 12}, {"sn": 5, "zone": "MCWP-B2", "start": "2026-07-10", "end": "2026-08-08", "ref": false, "row": 13}, {"sn": 6, "zone": "MCWP-B3", "start": "2026-08-09", "end": "2026-09-07", "ref": false, "row": 14}, {"sn": 7, "zone": "MCWP-C1", "start": "2026-06-12", "end": "2026-07-11", "ref": false, "row": 15}, {"sn": 8, "zone": "MCWP-C2", "start": "2026-07-12", "end": "2026-08-10", "ref": false, "row": 16}, {"sn": 9, "zone": "MCWP-C3", "start": "2026-08-11", "end": "2026-09-09", "ref": false, "row": 17}, {"sn": 10, "zone": "MCWP-D1", "start": "2026-06-14", "end": "2026-07-13", "ref": false, "row": 18}, {"sn": 11, "zone": "MCWP-D2", "start": "2026-07-14", "end": "2026-08-12", "ref": false, "row": 19}, {"sn": 12, "zone": "MCWP-D3", "start": "2026-08-13", "end": "2026-09-11", "ref": false, "row": 20}, {"sn": 13, "zone": "MCWP-E1", "start": "2026-06-16", "end": "2026-07-15", "ref": false, "row": 21}, {"sn": 14, "zone": "MCWP-E2", "start": "2026-07-16", "end": "2026-08-14", "ref": false, "row": 22}, {"sn": 15, "zone": "MCWP-E3", "start": "2026-08-15", "end": "2026-09-13", "ref": false, "row": 23}], "refSkipped": []}, {"title": "GONDOLA AFTER MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "gondolaAfter", "rows": [{"sn": 1, "zone": "G-G1", "start": "2026-07-09", "end": "2026-07-19", "ref": false, "row": 32}, {"sn": 2, "zone": "G-G2", "start": "2026-08-08", "end": "2026-08-18", "ref": false, "row": 33}, {"sn": 3, "zone": "G-G3", "start": "2026-09-07", "end": "2026-09-17", "ref": false, "row": 34}, {"sn": 4, "zone": "G-H1", "start": "2026-07-11", "end": "2026-07-21", "ref": false, "row": 35}, {"sn": 5, "zone": "G-H2", "start": "2026-08-10", "end": "2026-08-20", "ref": false, "row": 36}, {"sn": 6, "zone": "G-H3", "start": "2026-09-09", "end": "2026-09-19", "ref": false, "row": 37}, {"sn": 7, "zone": "G-I1", "start": "2026-07-13", "end": "2026-07-23", "ref": false, "row": 38}, {"sn": 8, "zone": "G-I2", "start": "2026-08-12", "end": "2026-08-22", "ref": false, "row": 39}, {"sn": 9, "zone": "G-I3", "start": "2026-09-11", "end": "2026-09-21", "ref": false, "row": 40}, {"sn": 10, "zone": "G-J1", "start": "2026-07-15", "end": "2026-07-25", "ref": false, "row": 41}, {"sn": 11, "zone": "G-J2", "start": "2026-08-14", "end": "2026-08-24", "ref": false, "row": 42}, {"sn": 12, "zone": "G-J3", "start": "2026-09-13", "end": "2026-09-23", "ref": false, "row": 43}, {"sn": 13, "zone": "G-K1", "start": "2026-07-17", "end": "2026-07-27", "ref": false, "row": 44}, {"sn": 14, "zone": "G-K2", "start": "2026-08-16", "end": "2026-08-26", "ref": false, "row": 45}, {"sn": 15, "zone": "G-K3", "start": "2026-09-15", "end": "2026-09-25", "ref": false, "row": 46}], "refSkipped": []}, {"title": "GONDOLA WORK SCHEDULE", "cycleKey": "gondolaDirect", "rows": [{"sn": 1, "zone": "G-A1", "start": "2026-06-08", "end": "2026-06-30", "ref": false, "row": 55}, {"sn": 2, "zone": "G-A2", "start": "2026-07-01", "end": "2026-07-23", "ref": false, "row": 56}, {"sn": 3, "zone": "G-A3", "start": "2026-07-24", "end": "2026-08-15", "ref": false, "row": 57}, {"sn": 4, "zone": "G-B1", "start": "2026-06-08", "end": "2026-06-30", "ref": false, "row": 58}, {"sn": 5, "zone": "G-B2", "start": "2026-07-01", "end": "2026-07-23", "ref": false, "row": 59}, {"sn": 6, "zone": "G-B3", "start": "2026-07-24", "end": "2026-08-15", "ref": false, "row": 60}, {"sn": 7, "zone": "G-B4", "start": "2026-08-16", "end": "2026-09-07", "ref": false, "row": 61}, {"sn": 8, "zone": "G-C1", "start": "2026-06-08", "end": "2026-06-30", "ref": false, "row": 62}, {"sn": 9, "zone": "G-C2", "start": "2026-07-01", "end": "2026-07-23", "ref": false, "row": 63}, {"sn": 10, "zone": "G-C3", "start": "2026-07-24", "end": "2026-08-15", "ref": false, "row": 64}, {"sn": 11, "zone": "G-C4", "start": "2026-08-16", "end": "2026-09-07", "ref": false, "row": 65}, {"sn": 12, "zone": "G-D1", "start": "2026-06-08", "end": "2026-06-30", "ref": false, "row": 66}, {"sn": 13, "zone": "G-D2", "start": "2026-07-01", "end": "2026-07-23", "ref": false, "row": 67}, {"sn": 14, "zone": "G-D3", "start": "2026-07-24", "end": "2026-08-15", "ref": false, "row": 68}, {"sn": 15, "zone": "G-D4", "start": "2026-08-16", "end": "2026-09-07", "ref": false, "row": 69}, {"sn": 16, "zone": "G-E1", "start": "2026-06-08", "end": "2026-06-30", "ref": false, "row": 70}, {"sn": 17, "zone": "G-E2", "start": "2026-07-01", "end": "2026-07-23", "ref": false, "row": 71}, {"sn": 18, "zone": "G-E3", "start": "2026-07-24", "end": "2026-08-15", "ref": false, "row": 72}, {"sn": 19, "zone": "G-E4", "start": "2026-08-16", "end": "2026-09-07", "ref": false, "row": 73}, {"sn": 20, "zone": "G-E5", "start": "2026-09-08", "end": "2026-09-30", "ref": false, "row": 74}, {"sn": 21, "zone": "G-F1", "start": "2026-07-01", "end": "2026-07-23", "ref": false, "row": 75}, {"sn": 22, "zone": "G-F2", "start": "2026-07-24", "end": "2026-08-15", "ref": false, "row": 76}, {"sn": 23, "zone": "G-F3", "start": "2026-08-16", "end": "2026-09-07", "ref": false, "row": 77}, {"sn": 24, "zone": "G-F4", "start": "2026-09-08", "end": "2026-09-30", "ref": false, "row": 78}], "refSkipped": []}], "419D": [{"title": "MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "mcwp", "rows": [{"sn": 1, "zone": "MCWP-A1", "start": "2026-05-28", "end": "2026-06-26", "ref": false, "row": 9}, {"sn": 2, "zone": "MCWP-A2", "start": "2026-06-27", "end": "2026-07-26", "ref": false, "row": 10}, {"sn": 3, "zone": "MCWP-A3", "start": "2026-07-27", "end": "2026-08-25", "ref": false, "row": 11}, {"sn": 4, "zone": "MCWP-B1", "start": "2026-05-30", "end": "2026-06-28", "ref": false, "row": 12}, {"sn": 5, "zone": "MCWP-B2", "start": "2026-06-29", "end": "2026-07-28", "ref": false, "row": 13}, {"sn": 6, "zone": "MCWP-B3", "start": "2026-07-29", "end": "2026-08-27", "ref": false, "row": 14}, {"sn": 7, "zone": "MCWP-C1", "start": "2026-06-01", "end": "2026-06-30", "ref": false, "row": 15}, {"sn": 8, "zone": "MCWP-C2", "start": "2026-07-01", "end": "2026-07-30", "ref": false, "row": 16}, {"sn": 9, "zone": "MCWP-C3", "start": "2026-07-31", "end": "2026-08-29", "ref": false, "row": 17}, {"sn": 10, "zone": "MCWP-D1", "start": "2026-06-03", "end": "2026-07-02", "ref": false, "row": 18}, {"sn": 11, "zone": "MCWP-D2", "start": "2026-07-03", "end": "2026-08-01", "ref": false, "row": 19}, {"sn": 12, "zone": "MCWP-D3", "start": "2026-08-02", "end": "2026-08-31", "ref": false, "row": 20}, {"sn": 13, "zone": "MCWP-E1", "start": "2026-06-05", "end": "2026-07-04", "ref": false, "row": 21}, {"sn": 14, "zone": "MCWP-E2", "start": "2026-07-05", "end": "2026-08-03", "ref": false, "row": 22}, {"sn": 15, "zone": "MCWP-E3", "start": "2026-08-04", "end": "2026-09-02", "ref": false, "row": 23}, {"sn": 16, "zone": "MCWP-F1", "start": "2026-06-07", "end": "2026-07-06", "ref": false, "row": 24}, {"sn": 17, "zone": "MCWP-F2", "start": "2026-07-07", "end": "2026-08-05", "ref": false, "row": 25}], "refSkipped": []}, {"title": "GONDOLA AFTER MAST CLIMBING WORK PLATFORM WORK SCHEDULE", "cycleKey": "gondolaAfter", "rows": [{"sn": 1, "zone": "G-I1", "start": "2026-06-28", "end": "2026-07-08", "ref": false, "row": 40}, {"sn": 2, "zone": "G-I2", "start": "2026-07-28", "end": "2026-08-07", "ref": false, "row": 41}, {"sn": 3, "zone": "G-I3", "start": "2026-08-27", "end": "2026-09-06", "ref": false, "row": 42}, {"sn": 4, "zone": "G-J1", "start": "2026-06-30", "end": "2026-07-10", "ref": false, "row": 43}, {"sn": 5, "zone": "G-J2", "start": "2026-07-30", "end": "2026-08-09", "ref": false, "row": 44}, {"sn": 6, "zone": "G-J3", "start": "2026-08-29", "end": "2026-09-08", "ref": false, "row": 45}, {"sn": 7, "zone": "G-K1", "start": "2026-07-02", "end": "2026-07-12", "ref": false, "row": 46}, {"sn": 8, "zone": "G-K2", "start": "2026-08-01", "end": "2026-08-11", "ref": false, "row": 47}, {"sn": 9, "zone": "G-K3", "start": "2026-08-31", "end": "2026-09-10", "ref": false, "row": 48}, {"sn": 10, "zone": "G-L1", "start": "2026-07-04", "end": "2026-07-14", "ref": false, "row": 49}, {"sn": 11, "zone": "G-L2", "start": "2026-08-03", "end": "2026-08-13", "ref": false, "row": 50}, {"sn": 12, "zone": "G-L3", "start": "2026-09-02", "end": "2026-09-12", "ref": false, "row": 51}, {"sn": 13, "zone": "G-M1", "start": "2026-07-06", "end": "2026-07-16", "ref": false, "row": 52}, {"sn": 14, "zone": "G-M2", "start": "2026-08-05", "end": "2026-08-15", "ref": false, "row": 53}, {"sn": 15, "zone": "G-M3", "start": "2026-09-04", "end": "2026-09-14", "ref": false, "row": 54}, {"sn": 16, "zone": "G-N1", "start": "2026-07-08", "end": "2026-07-18", "ref": false, "row": 55}, {"sn": 17, "zone": "G-N2", "start": "2026-08-07", "end": "2026-08-17", "ref": false, "row": 56}], "refSkipped": []}, {"title": "GONDOLA WORK SCHEDULE", "cycleKey": "gondolaDirect", "rows": [{"sn": 1, "zone": "G-A1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 65}, {"sn": 2, "zone": "G-A2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 66}, {"sn": 3, "zone": "G-A3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 67}, {"sn": 4, "zone": "G-A4", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 68}, {"sn": 5, "zone": "G-B1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 69}, {"sn": 6, "zone": "G-B2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 70}, {"sn": 7, "zone": "G-B3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 71}, {"sn": 8, "zone": "G-B4", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 72}, {"sn": 9, "zone": "G-C1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 73}, {"sn": 10, "zone": "G-C2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 74}, {"sn": 11, "zone": "G-C3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 75}, {"sn": 12, "zone": "G-C4", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 76}, {"sn": 13, "zone": "G-C5", "start": "2026-08-28", "end": "2026-09-19", "ref": false, "row": 77}, {"sn": 14, "zone": "G-D1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 78}, {"sn": 15, "zone": "G-D2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 79}, {"sn": 16, "zone": "G-D3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 80}, {"sn": 17, "zone": "G-D4", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 81}, {"sn": 18, "zone": "G-E1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 82}, {"sn": 19, "zone": "G-E2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 83}, {"sn": 20, "zone": "G-E3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 84}, {"sn": 21, "zone": "G-E4", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 85}, {"sn": 22, "zone": "G-F1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 86}, {"sn": 23, "zone": "G-F2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 87}, {"sn": 24, "zone": "G-F3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 88}, {"sn": 25, "zone": "G-F4", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 89}, {"sn": 26, "zone": "G-F5", "start": "2026-08-28", "end": "2026-09-19", "ref": false, "row": 90}, {"sn": 27, "zone": "G-G1", "start": "2026-05-28", "end": "2026-06-19", "ref": false, "row": 91}, {"sn": 28, "zone": "G-G2", "start": "2026-06-20", "end": "2026-07-12", "ref": false, "row": 92}, {"sn": 29, "zone": "G-G3", "start": "2026-07-13", "end": "2026-08-04", "ref": false, "row": 93}, {"sn": 30, "zone": "G-H1", "start": "2026-08-05", "end": "2026-08-27", "ref": false, "row": 94}, {"sn": 31, "zone": "G-H2", "start": "2026-08-28", "end": "2026-09-19", "ref": false, "row": 95}, {"sn": 32, "zone": "G-H3", "start": "2026-09-20", "end": "2026-10-12", "ref": false, "row": 96}], "refSkipped": []}]};
+
 function renderVerify(){
   const wrap = document.getElementById('verifyContent');
   if(!wrap) return;
-  wrap.innerHTML = '';
+  wrap.innerHTML='';
 
-  // Source-of-truth: what the app loaded at startup (embedded from Excel)
-  const EXPECTED = {
-    '419A': { mcwp: ['MCWP-A1','MCWP-A2','MCWP-A3','MCWP-B1','MCWP-B2','MCWP-B3','MCWP-C1','MCWP-C2','MCWP-D1'], gondolaAfter:[], gondolaDirect:[] },
-    '419B': { mcwp: ['MCWP-A1','MCWP-A2','MCWP-A3','MCWP-B1','MCWP-B2','MCWP-C1','MCWP-C2','MCWP-D1','MCWP-D2'],
-              gondolaAfter: ['G-F1','G-F2','G-F3','G-F4','G-G1','G-G2','G-G3','G-G4','G-H1'],
-              gondolaDirect: ['G-A1','G-A2','G-A3','G-A4','G-B1','G-B2','G-B3','G-B4','G-C1','G-C2','G-C3','G-C4','G-D1','G-D2','G-D3','G-D4','G-E1','G-E2','G-E3','G-F1','G-F2','G-F3','G-H1','G-H2','G-H3'] },
-    '419C': { mcwp: ['MCWP-A1','MCWP-A2','MCWP-A3','MCWP-B1','MCWP-B2','MCWP-B3','MCWP-C1','MCWP-C2','MCWP-C3','MCWP-D1','MCWP-D2','MCWP-D3','MCWP-E1','MCWP-E2','MCWP-E3'],
-              gondolaAfter: ['G-G1','G-G2','G-G3','G-H1','G-H2','G-H3','G-I1','G-I2','G-I3','G-J1','G-J2','G-J3','G-K1','G-K2','G-K3'],
-              gondolaDirect: ['G-A1','G-A2','G-A3','G-B1','G-B2','G-B3','G-B4','G-C1','G-C2','G-C3','G-C4','G-D1','G-D2','G-D3','G-D4','G-E1','G-E2','G-E3','G-E4','G-E5','G-F1','G-F2','G-F3','G-F4'] },
-    '419D': { mcwp: ['MCWP-A1','MCWP-A2','MCWP-A3','MCWP-B1','MCWP-B2','MCWP-B3','MCWP-C1','MCWP-C2','MCWP-C3','MCWP-D1','MCWP-D2','MCWP-D3','MCWP-E1','MCWP-E2','MCWP-E3','MCWP-F1','MCWP-F2'],
-              gondolaAfter: ['G-I1','G-I2','G-I3','G-J1','G-J2','G-J3','G-K1','G-K2','G-K3','G-L1','G-L2','G-L3','G-M1','G-M2','G-M3','G-N1','G-N2'],
-              gondolaDirect: ['G-A1','G-A2','G-A3','G-A4','G-B1','G-B2','G-B3','G-B4','G-C1','G-C2','G-C3','G-C4','G-C5','G-D1','G-D2','G-D3','G-D4','G-E1','G-E2','G-E3','G-E4','G-F1','G-F2','G-F3','G-F4','G-F5','G-G1','G-G2','G-G3','G-H1','G-H2','G-H3'] },
-  };
-  const CYCLE_EXPECTED = { mcwp:27, gondolaAfter:10, gondolaDirect:24 };
-  const CK_LABEL = {mcwp:'MCWP',gondolaAfter:'Gondola After MCWP',gondolaDirect:'Gondola Direct'};
+  const CK_LABEL={mcwp:'MCWP Schedule',gondolaAfter:'Gondola After MCWP',gondolaDirect:'Gondola Direct Schedule'};
 
-  // Summary header
-  const intro = document.createElement('div');
-  intro.style.cssText='background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:18px;';
-  intro.innerHTML='<h2 style="margin:0 0 8px;font-size:16px;">Data Verification Report</h2>'+
-    '<p style="margin:0;font-size:12.5px;color:var(--text-dim);">Compares the app\'s embedded data against the authoritative Excel zone lists. '+
-    'Source files: <b>SKN4C49 – 419B External Works MCWP & Gondola (2).xlsx</b> (for 419B) and '+
-    '<b>SKN4C49 – 419A External Works MCWP & Gondola (4).xlsx</b> (for 419A, 419C, 419D).</p>';
-  wrap.appendChild(intro);
+  let totalRows=0, totalErrors=0, totalRefSkipped=0;
+  const allErrors=[];
 
-  // Cycle verification
-  const cycCard = document.createElement('div'); cycCard.className='vcard';
-  const cycHead = document.createElement('div'); cycHead.className='vcardhead';
-  cycHead.innerHTML='<h3>Work Cycle Templates</h3>';
-  cycCard.appendChild(cycHead);
-  const cycBody = document.createElement('div'); cycBody.style.padding='10px 16px';
-  let cycOk=true;
-  Object.keys(CYCLE_EXPECTED).forEach(ck=>{
-    const exp=CYCLE_EXPECTED[ck];
-    const got=CYCLES[ck] ? CYCLES[ck].totalDays : 'MISSING';
-    const match = got===exp;
-    if(!match) cycOk=false;
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:12px;padding:5px 0;border-bottom:1px solid #1d2630;font-size:12.5px;';
-    const status=match?'<span class="vchip ok">✓ MATCH</span>':'<span class="vchip err">✗ MISMATCH</span>';
-    row.innerHTML=`${status} <b>${CK_LABEL[ck]}</b> — Expected: ${exp}d · Got: ${got}d · Tasks: ${CYCLES[ck]?CYCLES[ck].tasks.length:0}`;
-    cycBody.appendChild(row);
-  });
-  cycCard.appendChild(cycBody);
-  wrap.appendChild(cycCard);
+  // ── Summary header ────────────────────────────────────────────────────────
+  const introEl = document.createElement('div');
+  introEl.className='verifyintro';
+  introEl.id='verifyIntroEl';
+  wrap.appendChild(introEl);
 
-  // Zone verification per block per section
-  let totalIssues=0;
+  // ── For each block ────────────────────────────────────────────────────────
   BLOCK_NAMES.forEach(blk=>{
-    const expBlk = EXPECTED[blk]||{};
-    const card=document.createElement('div'); card.className='vcard';
-    const head=document.createElement('div'); head.className='vcardhead';
-    head.innerHTML=`<h3>Block ${blk}</h3>`;
-    card.appendChild(head);
+    const gtSecs = GROUND_TRUTH[blk]||[];
+    const appSecs = BLOCKS[blk]||[];
 
-    const table=document.createElement('table'); table.className='verifytable';
-    table.innerHTML='<thead><tr><th>Section</th><th>Expected</th><th>Got</th><th>Status</th><th>Missing</th><th>Extra</th></tr></thead>';
-    const tbody=document.createElement('tbody');
+    // Build app lookup: cycleKey → items list
+    const appByCk={};
+    appSecs.forEach(s=>{ appByCk[s.cycleKey]=s.items; });
 
-    const sections_in_data={};
-    BLOCKS[blk].forEach(sec=>{ sections_in_data[sec.cycleKey]=(sections_in_data[sec.cycleKey]||[]); sec.items.forEach(it=>sections_in_data[sec.cycleKey].push(it.zone)); });
+    const blockCard=document.createElement('div'); blockCard.className='vcard';
+    const blockHead=document.createElement('div'); blockHead.className='vcardhead';
+    const blockBadgeId='vbadge_'+blk;
+    blockHead.innerHTML='<h3>Block '+blk+'</h3><span id="'+blockBadgeId+'"></span>';
+    blockCard.appendChild(blockHead);
+    let blockErrors=0;
 
-    const allKeys=[...new Set([...Object.keys(expBlk),...Object.keys(sections_in_data)])].filter(k=>k!=='notused');
-    ['mcwp','gondolaAfter','gondolaDirect'].forEach(ck=>{
-      const expList=expBlk[ck]||[];
-      const gotList=sections_in_data[ck]||[];
-      const missing=expList.filter(z=>!gotList.includes(z));
-      const extra=gotList.filter(z=>!expList.includes(z));
-      const countOk=expList.length===gotList.length;
-      const zonesOk=missing.length===0 && extra.length===0;
-      const status=zonesOk&&countOk?'ok':(missing.length>0||extra.length>0?'err':'warn');
-      if(status!=='ok') totalIssues++;
-      const tr=document.createElement('tr'); tr.className=status;
-      const badge=status==='ok'?'<span class="vchip ok">✓ OK</span>':status==='err'?'<span class="vchip err">✗ ERROR</span>':'<span class="vchip warn">⚠ WARN</span>';
-      tr.innerHTML=`<td><b>${CK_LABEL[ck]||ck}</b></td><td>${expList.length}</td><td>${gotList.length}</td><td>${badge}</td>`+
-        `<td class="verifyzonelist">${missing.join(', ')||'—'}</td>`+
-        `<td class="verifyzonelist">${extra.join(', ')||'—'}</td>`;
-      tbody.appendChild(tr);
+    gtSecs.forEach(gtSec=>{
+      const ck=gtSec.cycleKey;
+      const gtRows=gtSec.rows;
+      const appItems=appByCk[ck]||[];
+
+      const secDiv=document.createElement('div');
+      secDiv.style.cssText='border-top:1px solid var(--border);';
+
+      const secTitle=document.createElement('div');
+      secTitle.style.cssText='padding:8px 16px;background:var(--panel2);font-size:11px;font-weight:700;'+
+        'text-transform:uppercase;letter-spacing:.4px;color:var(--text-dim);display:flex;gap:12px;align-items:center;';
+      secTitle.innerHTML='<span>'+CK_LABEL[ck]+'</span>'+
+        '<span style="color:var(--text-dim);font-weight:400;">'+gtSec.title+'</span>';
+      if(gtSec.refSkipped&&gtSec.refSkipped.length>0){
+        secTitle.innerHTML+='<span style="color:var(--st-inprogress);font-size:10.5px;">⚠ '+gtSec.refSkipped.length+' zone(s) skipped in Excel (#REF!): '+gtSec.refSkipped.join(', ')+'</span>';
+        totalRefSkipped+=gtSec.refSkipped.length;
+      }
+      secDiv.appendChild(secTitle);
+
+      // Row-by-row table
+      const table=document.createElement('table'); table.className='verifytable';
+      table.style.margin='0';
+      table.innerHTML='<thead><tr>'+
+        '<th style="width:50px">S/N</th>'+
+        '<th style="width:110px">Excel Zone</th>'+
+        '<th style="width:100px">Excel Start</th>'+
+        '<th style="width:100px">Excel End</th>'+
+        '<th style="width:14px"></th>'+
+        '<th style="width:110px">App Zone</th>'+
+        '<th style="width:100px">App Start</th>'+
+        '<th style="width:100px">App End</th>'+
+        '<th>Status</th>'+
+        '</tr></thead>';
+      const tbody=document.createElement('tbody');
+
+      gtRows.forEach((gt,i)=>{
+        totalRows++;
+        const app=appItems[i]||null;
+        const zoneOk=app&&app.zone===gt.zone;
+        const startOk=app&&app.start===gt.start;
+        const endOk=app&&app.end===gt.end;
+        const allOk=zoneOk&&startOk&&endOk;
+
+        if(!allOk){
+          totalErrors++; blockErrors++;
+          const reason=!app?'MISSING IN APP':!zoneOk?'Zone mismatch':(!startOk&&!endOk)?'Both dates wrong':!startOk?'Start date wrong':'End date wrong';
+          allErrors.push('['+blk+' '+ck+'] S/N '+gt.sn+' '+gt.zone+': '+reason);
+        }
+
+        const tr=document.createElement('tr');
+        tr.className=allOk?'ok':((!app||!zoneOk)?'err':'warn');
+
+        const arrow=allOk?
+          '<td style="text-align:center;color:var(--st-done);font-weight:700;">→</td>':
+          '<td style="text-align:center;color:var(--st-delayed);font-weight:700;">≠</td>';
+
+        const az=app?app.zone:'—', as_=app?app.start:'—', ae=app?app.end:'—';
+
+        const zoneCell=zoneOk?'<td>'+az+'</td>':'<td style="background:#fee2e2;font-weight:700;">'+az+'</td>';
+        const startCell=startOk?'<td>'+as_+'</td>':'<td style="background:#fef3c7;font-weight:700;">'+as_+'</td>';
+        const endCell=endOk?'<td>'+ae+'</td>':'<td style="background:#fef3c7;font-weight:700;">'+ae+'</td>';
+
+        const statusBadge=allOk?'<span class="vchip ok">✓ Match</span>':
+          (!app?'<span class="vchip err">✗ Missing</span>':
+           !zoneOk?'<span class="vchip err">✗ Zone code</span>':
+           '<span class="vchip warn">⚠ Date</span>');
+
+        tr.innerHTML='<td>'+gt.sn+'</td>'+
+          '<td><b>'+gt.zone+'</b></td>'+
+          '<td>'+gt.start+'</td>'+
+          '<td>'+gt.end+'</td>'+
+          arrow+
+          zoneCell+startCell+endCell+
+          '<td>'+statusBadge+'</td>';
+        tbody.appendChild(tr);
+      });
+
+      // Extra app rows beyond excel
+      if(appItems.length>gtRows.length){
+        for(let j=gtRows.length;j<appItems.length;j++){
+          totalErrors++; blockErrors++;
+          const app=appItems[j];
+          allErrors.push('['+blk+' '+ck+'] Extra in app: '+app.zone);
+          const tr=document.createElement('tr'); tr.className='err';
+          tr.innerHTML='<td>—</td><td>—</td><td>—</td><td>—</td>'+
+            '<td style="text-align:center;color:var(--st-delayed);">≠</td>'+
+            '<td><b>'+app.zone+'</b></td><td>'+app.start+'</td><td>'+app.end+'</td>'+
+            '<td><span class="vchip err">✗ Extra</span></td>';
+          tbody.appendChild(tr);
+        }
+      }
+
+      table.appendChild(tbody);
+      secDiv.appendChild(table);
+      blockCard.appendChild(secDiv);
     });
-    table.appendChild(tbody);
-    card.appendChild(table);
 
-    // Show full zone lists
-    const detail=document.createElement('div');
-    detail.style.cssText='padding:10px 16px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:11px;';
-    ['mcwp','gondolaAfter','gondolaDirect'].forEach(ck=>{
-      const zones=sections_in_data[ck]||[];
-      const d=document.createElement('div');
-      d.innerHTML=`<b style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-dim);">${CK_LABEL[ck]} (${zones.length} zones)</b><br>`+
-        zones.map(z=>`<span style="display:inline-block;background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin:1px;">${z}</span>`).join('');
-      detail.appendChild(d);
-    });
-    card.appendChild(detail);
-    wrap.appendChild(card);
+    const badge=document.getElementById(blockBadgeId);
+    if(badge) badge.innerHTML=blockErrors===0?
+      '<span class="vchip ok">✓ All '+
+        GROUND_TRUTH[blk].reduce((a,s)=>a+s.rows.length,0)+' rows match</span>':
+      '<span class="vchip err">✗ '+blockErrors+' error(s)</span>';
+
+    wrap.appendChild(blockCard);
   });
 
-  // Update header with overall result
-  const badge=totalIssues===0?'<span class="vchip ok">✓ ALL DATA VERIFIED</span>':'<span class="vchip err">✗ '+totalIssues+' SECTION(S) HAVE ISSUES</span>';
-  intro.querySelector('h2').innerHTML='Data Verification Report &nbsp;'+badge;
-}
+  // ── Update summary header ─────────────────────────────────────────────────
+  const overallBadge=totalErrors===0?
+    '<span class="vchip ok" style="font-size:14px;padding:5px 14px;">✓ ALL '+totalRows+' ROWS VERIFIED — EXACT MATCH</span>':
+    '<span class="vchip err" style="font-size:14px;padding:5px 14px;">✗ '+totalErrors+' MISMATCH(ES) IN '+totalRows+' ROWS</span>';
 
+  introEl.innerHTML='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'+
+    '<div><div style="font-size:18px;font-weight:800;margin-bottom:6px;">Data Verification Report &nbsp;'+overallBadge+'</div>'+
+    '<div style="font-size:12.5px;color:var(--text-dim);">Row-by-row comparison of every zone code, S/N, start date, and end date against the uploaded Excel files. '+
+    'Source: <b>419B file</b> for Block 419B · <b>419A file</b> for Blocks 419A, 419C, 419D. '+
+    (totalRefSkipped>0?totalRefSkipped+' zone(s) skipped (Excel #REF! broken formula — dates unavailable in source).':'')+
+    '</div></div></div>'+
+    (totalErrors>0?'<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;margin-top:12px;font-size:12px;"><b>Errors:</b><ul style="margin:6px 0 0;padding-left:18px;">'+
+      allErrors.map(e=>'<li>'+e+'</li>').join('')+'</ul></div>':'');
+}
 function refreshAll(){ render(); renderDashboard(); renderLPS(); buildMapsTab(); renderVerify(); }
 
 
