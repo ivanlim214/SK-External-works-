@@ -1859,6 +1859,8 @@ function renderDashboard(){
     const gondolaIds = ids.filter(id=>zoneType(zoneNameFromId(id))==='gondola');
     const card = document.createElement('div');
     card.className='blockcard';
+
+    // Card header + donut + stat rows
     card.innerHTML =
       '<div class="blockcardhead"><h3>Block '+blk+'</h3>'+
         '<span class="pctbadge" style="color:var(--st-done);">'+pct+'% done</span>'+
@@ -1875,7 +1877,60 @@ function renderDashboard(){
         '</div>'+
       '</div>'+
       '<div class="typesplit"><span><b>'+mcwpIds.length+'</b> MCWP zones</span><span><b>'+gondolaIds.length+'</b> Gondola zones</span>'+
-        '<span style="margin-left:auto;cursor:pointer;color:var(--accent);" data-goto="'+blk+'">Open in Planner →</span></div>';
+        '<span style="margin-left:auto;cursor:pointer;color:var(--accent);" data-goto="'+blk+'">Open in Planner →</span>'+
+        '<span style="cursor:pointer;color:var(--accent);font-size:11px;margin-left:14px;font-weight:600;" data-toggle="'+blk+'">▲ Hide zone detail</span>'+
+      '</div>';
+
+    // Zone detail table (collapsible)
+    const detail = document.createElement('div');
+    detail.id = 'blkdetail_'+blk;
+    detail.style.cssText='display:block;border-top:1px solid var(--border);';
+    BLOCKS[blk].forEach(sec=>{
+      const secH = document.createElement('div');
+      secH.style.cssText='padding:6px 18px;background:var(--panel2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-dim);';
+      secH.textContent=sec.title;
+      detail.appendChild(secH);
+      const tbl = document.createElement('table');
+      tbl.style.cssText='width:100%;border-collapse:collapse;font-size:12px;';
+      tbl.innerHTML='<thead><tr style="background:var(--panel2);">'+
+        '<th style="padding:5px 10px;text-align:left;font-size:10px;color:var(--text-dim);font-weight:700;border-bottom:1px solid var(--border);">S/N</th>'+
+        '<th style="padding:5px 10px;text-align:left;font-size:10px;color:var(--text-dim);font-weight:700;border-bottom:1px solid var(--border);">Zone</th>'+
+        '<th style="padding:5px 10px;text-align:left;font-size:10px;color:var(--text-dim);font-weight:700;border-bottom:1px solid var(--border);">Planned Start</th>'+
+        '<th style="padding:5px 10px;text-align:left;font-size:10px;color:var(--text-dim);font-weight:700;border-bottom:1px solid var(--border);">Planned End</th>'+
+        '<th style="padding:5px 10px;text-align:left;font-size:10px;color:var(--text-dim);font-weight:700;border-bottom:1px solid var(--border);">Status</th>'+
+        '<th style="padding:5px 10px;text-align:right;font-size:10px;color:var(--text-dim);font-weight:700;border-bottom:1px solid var(--border);">% Done</th>'+
+      '</tr></thead>';
+      const tbody = document.createElement('tbody');
+      sec.items.forEach(it=>{
+        const zs=STATE.zones[it.id];
+        const eff=effectiveZoneStatus(it.id);
+        const zPct=zoneProgress(it.id);
+        const stColor=STATUS_HEX[eff];
+        const tr=document.createElement('tr');
+        tr.style.cssText='cursor:pointer;border-bottom:1px solid var(--panel3);';
+        tr.innerHTML='<td style="padding:5px 10px;color:var(--text-dim);">'+it.sn+'</td>'+
+          '<td style="padding:5px 10px;font-weight:700;">'+it.zone+'</td>'+
+          '<td style="padding:5px 10px;color:var(--text-dim);">'+zs.start+'</td>'+
+          '<td style="padding:5px 10px;color:var(--text-dim);">'+zs.end+'</td>'+
+          '<td style="padding:5px 10px;"><span style="color:'+stColor+';font-weight:700;font-size:11px;">'+STATUS_LABEL[eff]+'</span></td>'+
+          '<td style="padding:5px 10px;text-align:right;font-weight:700;color:'+(zPct===100?STATUS_HEX.done:zPct>0?STATUS_HEX.inprogress:STATUS_HEX.notstarted)+'">'+zPct+'%</td>';
+        tr.onmouseenter=()=>tr.style.background='var(--panel2)';
+        tr.onmouseleave=()=>tr.style.background='';
+        tr.onclick=()=>openModal(it.id);
+        tbody.appendChild(tr);
+      });
+      tbl.appendChild(tbody);
+      detail.appendChild(tbl);
+    });
+    card.appendChild(detail);
+
+    // Wire toggle button
+    card.querySelector('[data-toggle]').onclick = (e)=>{
+      const isOpen = detail.style.display !== 'none';
+      detail.style.display = isOpen ? 'none' : 'block';
+      e.target.textContent = isOpen ? '▼ Show zone detail' : '▲ Hide zone detail';
+      e.target.style.color = isOpen ? 'var(--text-dim)' : 'var(--accent)';
+    };
     card.querySelector('[data-goto]').onclick = ()=>{
       selectedBlocks = new Set([blk]);
       document.querySelector('#mainViewToggle button[data-mv="planner"]').click();
@@ -2086,67 +2141,294 @@ function buildPrintGanttSection(blk){
   return outer;
 }
 
-function buildPrintReport(){
-  const root = document.getElementById('printRoot');
-  root.innerHTML = '';
-
-  // Page 1 — title + dashboard summary
-  const p0 = document.createElement('div'); p0.className='ppage';
-  p0.innerHTML = '<div class="ptitle">SKN4C49 — External Works Takt Plan</div>'+
+// ── Shared: title + summary table ────────────────────────────────────────
+function buildPrintSummaryPage(){
+  const p = document.createElement('div'); p.className='ppage';
+  p.innerHTML = '<div class="ptitle">SKN4C49 — External Works Takt Plan</div>'+
     '<div class="psub">MCWP &amp; Gondola Tracker — Status Report — Generated '+fmtD(new Date())+'</div>';
   const table = document.createElement('table'); table.className='psummarytable';
-  table.innerHTML = '<tr><th>Block</th><th>Zones</th><th>% Done</th><th>% Active<br><small style="font-weight:400;font-size:9px;">(Done + In Progress)</small></th><th>Done</th><th>In Progress</th><th>Delayed</th><th>Not Started</th></tr>';
+  table.innerHTML = '<tr><th>Block</th><th>Zones</th><th>% Done</th>'+
+    '<th>% Active<br><small style="font-weight:400;font-size:9px;">(Done+InProgress)</small></th>'+
+    '<th>Done</th><th>In Progress</th><th>Delayed</th><th>Not Started</th></tr>';
   BLOCK_NAMES.forEach(blk=>{
-    const ids = zoneIdsForBlock(blk);
-    const counts = statusCountsFor(ids);
-    const pct = taskCompletionFor(ids);
-    const activePct = taskActiveFor(ids);
-    const tr = document.createElement('tr');
-    tr.innerHTML = '<td><b>Block '+blk+'</b></td><td>'+ids.length+'</td>'+
+    const ids=zoneIdsForBlock(blk);
+    const counts=statusCountsFor(ids);
+    const pct=taskCompletionFor(ids);
+    const activePct=taskActiveFor(ids);
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><b>Block '+blk+'</b></td><td>'+ids.length+'</td>'+
       '<td style="color:#15803d;font-weight:700;">'+pct+'%</td>'+
       '<td style="color:#d97706;font-weight:700;">'+activePct+'%</td>'+
       '<td>'+counts.done+'</td><td>'+counts.inprogress+'</td><td>'+counts.delayed+'</td><td>'+counts.notstarted+'</td>';
     table.appendChild(tr);
   });
-  p0.appendChild(table);
+  p.appendChild(table);
+  return p;
+}
+
+// ── Dashboard print: summary + PPC + delay causes + block detail cards ────
+function buildPrintDashboard(root){
+  root.appendChild(buildPrintSummaryPage());
+
+  // Page 2: Visual block overview with donut charts (2×2 grid)
+  const p0=document.createElement('div'); p0.className='ppage';
+  p0.innerHTML='<div class="ptitle">Dashboard — Block Status Overview</div>'+
+    '<div class="psub">Generated '+fmtD(new Date())+'</div>';
+
+  const donutGrid=document.createElement('div');
+  donutGrid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;';
+
+  BLOCK_NAMES.forEach(blk=>{
+    const ids=zoneIdsForBlock(blk);
+    const counts=statusCountsFor(ids);
+    const pct=taskCompletionFor(ids);
+    const activePct=taskActiveFor(ids);
+    const mcwpIds=ids.filter(id=>zoneType(zoneNameFromId(id))==='mcwp');
+    const gondolaIds=ids.filter(id=>zoneType(zoneNameFromId(id))==='gondola');
+
+    const cell=document.createElement('div');
+    cell.style.cssText='border:1px solid #d0d5de;border-radius:10px;overflow:hidden;background:#fff;';
+
+    const cellHead=document.createElement('div');
+    cellHead.style.cssText='padding:10px 14px;background:#f4f6f9;border-bottom:1px solid #d0d5de;display:flex;align-items:center;gap:10px;';
+    cellHead.innerHTML='<b style="font-size:14px;">Block '+blk+'</b>'+
+      '<span style="color:#15803d;font-weight:800;font-size:12px;">'+pct+'% done</span>'+
+      '<span style="color:#d97706;font-weight:800;font-size:12px;">'+activePct+'% active</span>';
+    cell.appendChild(cellHead);
+
+    const cellBody=document.createElement('div');
+    cellBody.style.cssText='padding:14px;display:flex;gap:16px;align-items:center;';
+
+    // Donut SVG — donutSVG uses STATUS_HEX (hex values) so prints correctly
+    const donutWrap=document.createElement('div');
+    donutWrap.style.cssText='position:relative;width:110px;height:110px;flex-shrink:0;';
+    donutWrap.innerHTML=donutSVG(counts,110,16)+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">'+
+        '<div style="font-size:18px;font-weight:800;">'+ids.length+'</div>'+
+        '<div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.4px;">zones</div>'+
+      '</div>';
+    cellBody.appendChild(donutWrap);
+
+    // Stat legend
+    const statCol=document.createElement('div');
+    statCol.style.cssText='flex:1;display:flex;flex-direction:column;gap:6px;font-size:12px;';
+    [[STATUS_HEX.done,'Done',counts.done],[STATUS_HEX.inprogress,'In Progress',counts.inprogress],
+     [STATUS_HEX.delayed,'Delayed',counts.delayed],[STATUS_HEX.notstarted,'Not Started',counts.notstarted]].forEach(([col,lbl,n])=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;';
+      row.innerHTML='<span style="width:10px;height:10px;border-radius:50%;background:'+col+';display:inline-block;flex-shrink:0;"></span>'+
+        '<span style="flex:1;color:#374151;">'+lbl+'</span><span style="font-weight:700;">'+n+'</span>';
+      statCol.appendChild(row);
+    });
+    const typeRow=document.createElement('div');
+    typeRow.style.cssText='margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;font-size:11px;color:#64748b;';
+    typeRow.innerHTML='<b>'+mcwpIds.length+'</b> MCWP · <b>'+gondolaIds.length+'</b> Gondola';
+    statCol.appendChild(typeRow);
+    cellBody.appendChild(statCol);
+    cell.appendChild(cellBody);
+    donutGrid.appendChild(cell);
+  });
+  p0.appendChild(donutGrid);
   root.appendChild(p0);
 
-  // Pages per block — zone map, then takt plan
+  // PPC + delay causes page
+  const p1=document.createElement('div'); p1.className='ppage';
+  const ppc=computePPC(null);
+  const allIds=[]; BLOCK_NAMES.forEach(b=>allIds.push(...zoneIdsForBlock(b)));
+  const dc=delayCauseCounts(null);
+  const totalDelayed=Object.values(dc.counts).reduce((a,b)=>a+b,0)+dc.unspecified;
+
+  p1.innerHTML='<div class="ptitle">Dashboard — PPC &amp; Delay Analysis</div>'+
+    '<div class="psub">Generated '+fmtD(new Date())+'</div>';
+
+  // PPC section
+  const ppcDiv=document.createElement('div');
+  ppcDiv.style.cssText='margin:14px 0;padding:14px;background:#f4f6f9;border-radius:8px;border:1px solid #d0d5de;';
+  const ppcVal=ppc.pct===null?'N/A':ppc.pct+'%';
+  const ppcColor=ppc.pct===null?'#64748b':(ppc.pct>=80?'#15803d':ppc.pct>=50?'#d97706':'#dc2626');
+  ppcDiv.innerHTML='<div style="font-size:22px;font-weight:900;color:'+ppcColor+';">PPC — '+ppcVal+'</div>'+
+    '<div style="font-size:12px;color:#64748b;margin-top:4px;">'+ppc.done+' of '+ppc.total+' tasks promised in the last 7 days were completed on time.</div>';
+
+  // Per-block PPC
+  const ppcTable=document.createElement('table'); ppcTable.className='psummarytable'; ppcTable.style.marginTop='10px';
+  ppcTable.innerHTML='<tr><th>Block</th><th>PPC</th><th>Done</th><th>Total Promised</th></tr>';
   BLOCK_NAMES.forEach(blk=>{
-    const pMap = document.createElement('div'); pMap.className='ppage';
-    const ids = zoneIdsForBlock(blk);
-    const counts = statusCountsFor(ids);
-    pMap.innerHTML = '<div class="ptitle">Block '+blk+' — Zone Map</div>'+
+    const bppc=computePPC(zoneIdsForBlock(blk));
+    const tr=document.createElement('tr');
+    const ppcColor2=bppc.pct===null?'#64748b':(bppc.pct>=80?'#15803d':bppc.pct>=50?'#d97706':'#dc2626');
+    tr.innerHTML='<td>Block '+blk+'</td>'+
+      '<td style="font-weight:700;color:'+ppcColor2+';">'+(bppc.pct===null?'N/A':bppc.pct+'%')+'</td>'+
+      '<td>'+bppc.done+'</td><td>'+bppc.total+'</td>';
+    ppcTable.appendChild(tr);
+  });
+  ppcDiv.appendChild(ppcTable);
+  p1.appendChild(ppcDiv);
+
+  // Delay causes
+  if(totalDelayed>0){
+    const dcDiv=document.createElement('div');
+    dcDiv.style.cssText='margin:14px 0;padding:14px;background:#f4f6f9;border-radius:8px;border:1px solid #d0d5de;';
+    dcDiv.innerHTML='<div style="font-size:14px;font-weight:700;margin-bottom:10px;">Delay Causes ('+totalDelayed+' delayed tasks)</div>';
+    const entries=DELAY_CAUSES.map(c=>[c,dc.counts[c]]);
+    entries.push(['Not specified',dc.unspecified]);
+    entries.sort((a,b)=>b[1]-a[1]).filter(([,n])=>n>0).forEach(([label,count])=>{
+      const pct=Math.round(count/totalDelayed*100);
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px;';
+      row.innerHTML='<span style="width:200px;color:#374151;">'+label+'</span>'+
+        '<div style="flex:1;height:12px;background:#e5e7eb;border-radius:6px;overflow:hidden;">'+
+          '<div style="width:'+pct+'%;height:100%;background:#dc2626;"></div></div>'+
+        '<span style="font-weight:700;width:30px;text-align:right;">'+count+'</span>';
+      dcDiv.appendChild(row);
+    });
+    p1.appendChild(dcDiv);
+  }
+  root.appendChild(p1);
+
+  // One page per block: status breakdown
+  BLOCK_NAMES.forEach(blk=>{
+    const ids=zoneIdsForBlock(blk);
+    const counts=statusCountsFor(ids);
+    const pct=taskCompletionFor(ids);
+    const activePct=taskActiveFor(ids);
+    const pg=document.createElement('div'); pg.className='ppage';
+    pg.innerHTML='<div class="ptitle">Block '+blk+' — Zone Status Detail</div>'+
+      '<div class="psub">'+ids.length+' zones · '+pct+'% done · '+activePct+'% active</div>';
+
+    // Status summary bar
+    const bar=document.createElement('div');
+    bar.style.cssText='display:flex;height:20px;border-radius:6px;overflow:hidden;margin:12px 0;';
+    const total=ids.length||1;
+    [[counts.done,'#15803d','Done'],[counts.inprogress,'#d97706','In Progress'],
+     [counts.delayed,'#dc2626','Delayed'],[counts.notstarted,'#94a3b8','Not Started']].forEach(([n,col,lbl])=>{
+      if(n===0) return;
+      const seg=document.createElement('div');
+      seg.style.cssText='width:'+Math.round(n/total*100)+'%;background:'+col+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;';
+      seg.textContent=n;
+      seg.title=lbl+': '+n;
+      bar.appendChild(seg);
+    });
+    pg.appendChild(bar);
+
+    // Zone list table grouped by section
+    BLOCKS[blk].forEach(sec=>{
+      const secH=document.createElement('div');
+      secH.style.cssText='font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748b;margin:10px 0 4px;padding:4px 0;border-bottom:1px solid #d0d5de;';
+      secH.textContent=sec.title;
+      pg.appendChild(secH);
+      const tbl=document.createElement('table'); tbl.className='psummarytable';
+      tbl.style.cssText='margin-bottom:6px;';
+      tbl.innerHTML='<tr><th>S/N</th><th>Zone</th><th>Planned Start</th><th>Planned End</th><th>Status</th><th>% Done</th></tr>';
+      sec.items.forEach(it=>{
+        const zs=STATE.zones[it.id];
+        const eff=effectiveZoneStatus(it.id);
+        const zPct=zoneProgress(it.id);
+        const stColor={notstarted:'#64748b',inprogress:'#d97706',done:'#15803d',delayed:'#dc2626'}[eff];
+        const tr=document.createElement('tr');
+        tr.innerHTML='<td>'+it.sn+'</td><td><b>'+it.zone+'</b></td>'+
+          '<td>'+zs.start+'</td><td>'+zs.end+'</td>'+
+          '<td style="color:'+stColor+';font-weight:700;">'+STATUS_LABEL[eff]+'</td>'+
+          '<td>'+zPct+'%</td>';
+        tbl.appendChild(tr);
+      });
+      pg.appendChild(tbl);
+    });
+    root.appendChild(pg);
+  });
+}
+
+// ── Planner / Zone Maps print ─────────────────────────────────────────────
+function buildPrintPlanner(root){
+  root.appendChild(buildPrintSummaryPage());
+  BLOCK_NAMES.forEach(blk=>{
+    const ids=zoneIdsForBlock(blk);
+    const counts=statusCountsFor(ids);
+    const pMap=document.createElement('div'); pMap.className='ppage';
+    pMap.innerHTML='<div class="ptitle">Block '+blk+' — Zone Map</div>'+
       '<div class="psub">'+ids.length+' zones · Done '+counts.done+' · In Progress '+counts.inprogress+' · Delayed '+counts.delayed+' · Not Started '+counts.notstarted+'</div>';
-    const img = document.createElement('img'); img.className='pmapimg';
-    img.src = 'data:image/png;base64,' + IMAGES[blk];
+    const img=document.createElement('img'); img.className='pmapimg';
+    img.src='data:image/png;base64,'+IMAGES[blk];
     pMap.appendChild(img);
-    const leg = document.createElement('div'); leg.className='plegend';
-    leg.innerHTML = '<span style="color:'+STATUS_HEX.done+'">\u25CF Done</span>'+
+    const leg=document.createElement('div'); leg.className='plegend';
+    leg.innerHTML='<span style="color:'+STATUS_HEX.done+'">\u25CF Done</span>'+
       '<span style="color:'+STATUS_HEX.inprogress+'">\u25CF In Progress</span>'+
       '<span style="color:'+STATUS_HEX.delayed+'">\u25CF Delayed</span>'+
       '<span style="color:'+STATUS_HEX.notstarted+'">\u25CF Not Started</span>';
     pMap.appendChild(leg);
     root.appendChild(pMap);
 
-    const pGantt = document.createElement('div'); pGantt.className='ppage';
-    pGantt.innerHTML = '<div class="ptitle">Block '+blk+' — Takt Plan (Month view)</div>'+
+    const pGantt=document.createElement('div'); pGantt.className='ppage';
+    pGantt.innerHTML='<div class="ptitle">Block '+blk+' — Takt Plan (Month view)</div>'+
       '<div class="psub">Each bar segment is one task in the MCWP/Gondola work cycle; colors = task identity, outline/fill = status.</div>';
-    const ganttWrap = document.createElement('div'); ganttWrap.className='pganttwrap';
-    const ganttClone = buildPrintGanttSection(blk);
-    ganttWrap.appendChild(ganttClone);
+    const ganttWrap=document.createElement('div'); ganttWrap.className='pganttwrap';
+    ganttWrap.appendChild(buildPrintGanttSection(blk));
     pGantt.appendChild(ganttWrap);
     root.appendChild(pGantt);
   });
-
-  // restore the live interactive view to what it was
   refreshAll();
+}
+
+// ── Dispatcher ────────────────────────────────────────────────────────────
+function buildPrintReport(){
+  const root = document.getElementById('printRoot');
+  root.innerHTML = '';
+  if(mainView === 'dashboard'){
+    buildPrintDashboard(root);
+  } else if(mainView === 'maps'){
+    // Zone Maps tab: just the zone map images
+    root.appendChild(buildPrintSummaryPage());
+    BLOCK_NAMES.forEach(blk=>{
+      const ids=zoneIdsForBlock(blk);
+      const counts=statusCountsFor(ids);
+      const pg=document.createElement('div'); pg.className='ppage';
+      pg.innerHTML='<div class="ptitle">Block '+blk+' — Zone Map</div>'+
+        '<div class="psub">'+ids.length+' zones · Done '+counts.done+' · In Progress '+counts.inprogress+' · Delayed '+counts.delayed+'</div>';
+      const img=document.createElement('img'); img.className='pmapimg';
+      img.src='data:image/png;base64,'+IMAGES[blk];
+      pg.appendChild(img);
+      root.appendChild(pg);
+    });
+  } else if(mainView === 'lps'){
+    // LPS tab: delayed tasks + 6-week lookahead table
+    root.appendChild(buildPrintSummaryPage());
+    const pg=document.createElement('div'); pg.className='ppage';
+    pg.innerHTML='<div class="ptitle">Last Planner System — 6-Week Look-ahead</div>'+
+      '<div class="psub">Generated '+fmtD(new Date())+(LPS_SUBCON_FILTER?' · Subcon filter: '+LPS_SUBCON_FILTER:'')+'</div>';
+    const weeks=getWeekRanges(6);
+    weeks.forEach((w,idx)=>{
+      if(!LPS_WEEK_FILTER.has(idx+1)) return;
+      const records=tasksOverlapping(w.start,w.end).filter(r=>!LPS_SUBCON_FILTER||normalizeSubcon(r.taskDef.subcon)===LPS_SUBCON_FILTER);
+      const wHead=document.createElement('div');
+      wHead.style.cssText='font-size:11px;font-weight:700;text-transform:uppercase;color:#2563eb;margin:10px 0 4px;padding:4px 0;border-bottom:2px solid #2563eb;';
+      wHead.textContent=w.label+' ('+w.sub+') — '+records.length+' tasks';
+      pg.appendChild(wHead);
+      if(records.length>0){
+        const tbl=document.createElement('table'); tbl.className='psummarytable'; tbl.style.marginBottom='8px;';
+        tbl.innerHTML='<tr><th>Block</th><th>Zone</th><th>Task</th><th>Subcon</th><th>Start</th><th>End</th><th>Status</th></tr>';
+        records.forEach(rec=>{
+          const eff=effectiveZoneStatus(rec.it.id);
+          const stColor={notstarted:'#64748b',inprogress:'#d97706',done:'#15803d',delayed:'#dc2626'}[rec.ts.status];
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td>'+rec.blk+'</td><td>'+rec.it.zone+'</td><td>'+rec.taskDef.activity+'</td>'+
+            '<td>'+normalizeSubcon(rec.taskDef.subcon)+'</td><td>'+rec.ts.start+'</td><td>'+rec.ts.end+'</td>'+
+            '<td style="color:'+stColor+';font-weight:700;">'+STATUS_LABEL[rec.ts.status]+'</td>';
+          tbl.appendChild(tr);
+        });
+        pg.appendChild(tbl);
+      }
+    });
+    root.appendChild(pg);
+  } else {
+    // Planner (default)
+    buildPrintPlanner(root);
+  }
 }
 
 document.getElementById('exportPdfBtn').onclick = ()=>{
   const btn = document.getElementById('exportPdfBtn');
+  const viewLabels = {planner:'Takt Plan', dashboard:'Dashboard', maps:'Zone Maps', lps:'Last Planner', verify:'Verification Report'};
   btn.disabled = true;
-  showExportOverlay('Building printable report…');
+  showExportOverlay('Building '+( viewLabels[mainView]||'report')+' print report…');
   setTimeout(()=>{
     try{
       buildPrintReport();
@@ -2154,9 +2436,9 @@ document.getElementById('exportPdfBtn').onclick = ()=>{
       setTimeout(()=>{
         try{
           window.print();
-          toast('Print dialog requested. If nothing appeared, this file is likely open inside a sandboxed preview — download it and open the .html file directly in your browser, then try again.', 'ok');
+          toast('Print dialog opened — choose "Save as PDF" from the printer list.', 'ok');
         }catch(printErr){
-          toast('window.print() was blocked by the browser/preview sandbox. Open the downloaded .html file directly (not inside a chat preview) and try again.', 'warn');
+          toast('window.print() was blocked. Open the downloaded .html file directly in your browser and try again.', 'warn');
         }
         btn.disabled = false;
         hideExportOverlay();
