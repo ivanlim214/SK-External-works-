@@ -145,7 +145,7 @@
   .progressbar > div{height:100%;background:linear-gradient(90deg,var(--st-inprogress),var(--st-done));}
 
   #dashboardMain{padding:14px 20px 28px;}
-  .dashtopgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+  .dashtopgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px;}
   .mapsgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
   .mapfullcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
   .mapfullhead{padding:12px 18px;background:var(--panel2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
@@ -879,14 +879,14 @@ function buildMapsTab(){
       const m = markers[zoneName];
       const st = STATE.zones[id];
       const ov = document.createElement('div');
-      ov.className='mapoverlay st-'+st.status;
+      ov.className='mapoverlay st-'+effectiveZoneStatus(id);
       ov.id='mapov_'+blk+'_'+zoneName.replace(/[^a-zA-Z0-9]/g,'_');
       ov.dataset.id=id; ov.dataset.zone=zoneName;
       ov.style.left=(m.x*100)+'%';
       ov.style.top=(m.y*100)+'%';
       ov.style.width=(m.w*100)+'%';
       ov.style.height=(m.h*100)+'%';
-      ov.title=zoneName+' — '+STATUS_LABEL[st.status];
+      ov.title=zoneName+' — '+STATUS_LABEL[effectiveZoneStatus(id)];
       ov.onclick=()=>openModal(id);
       oLayer.appendChild(ov);
     });
@@ -903,7 +903,7 @@ function buildMapsTab(){
       names.forEach(n=>{
         const id=ZONE_IDS_BY_NAME[blk][n];
         const st=STATE.zones[id];
-        const chip=document.createElement('div'); chip.className='zchip st-'+st.status;
+        const chip=document.createElement('div'); chip.className='zchip st-'+effectiveZoneStatus(id);
         chip.textContent=n; chip.dataset.id=id; chip.dataset.blk=blk;
         chip.onclick=()=>openModal(id);
         row.appendChild(chip);
@@ -938,8 +938,8 @@ function updateMapsTimeline(){
       const s=parseD(st.start), e=parseD(st.end);
       const isActive=d>=s && d<=e;
       // refresh status class in case status changed
-      el.className='mapoverlay st-'+st.status+(isActive?' active-date':'');
-      el.title=zoneName+' — '+STATUS_LABEL[st.status]+(isActive?' (ACTIVE)':'');
+      el.className='mapoverlay st-'+effectiveZoneStatus(id)+(isActive?' active-date':'');
+      el.title=zoneName+' — '+STATUS_LABEL[effectiveZoneStatus(id)]+(isActive?' (ACTIVE)':'');
     });
     // update chips in maps tab
     const chipsWrap=document.getElementById('mapchips_'+blk);
@@ -1165,12 +1165,12 @@ function buildPins(){
     const m = markers[zoneName];
     const st = STATE.zones[id];
     const pin = document.createElement('div');
-    pin.className = 'pin '+m.type+' st-'+st.status;
+    pin.className = 'pin '+m.type+' st-'+effectiveZoneStatus(id);
     pin.style.left = (m.x + m.w/2)*100+'%';
     pin.style.top = (m.y + m.h/2)*100+'%';
     pin.style.width = Math.max(m.w*100,3)+'%';
     pin.style.height = Math.max(m.h*100,2.2)+'%';
-    pin.title = zoneName+' — '+STATUS_LABEL[st.status];
+    pin.title = zoneName+' — '+STATUS_LABEL[effectiveZoneStatus(id)];
     pin.dataset.id = id;
     pin.onclick = ()=> openModal(id);
     layer.appendChild(pin);
@@ -1199,7 +1199,7 @@ function buildZoneGrid(){
         const id=ZONE_IDS_BY_NAME[blk][n];
         const st=STATE.zones[id];
         const chip=document.createElement('div');
-        chip.className='zchip st-'+st.status;
+        chip.className='zchip st-'+effectiveZoneStatus(id);
         chip.textContent=n; chip.dataset.id=id;
         chip.onclick=()=>openModal(id);
         grid.appendChild(chip);
@@ -1298,7 +1298,7 @@ function buildGantt(){
 
       // label column item
       const llItem = document.createElement('div');
-      const _llst = STATE.zones[it.id].status;
+      const _llst = effectiveZoneStatus(it.id);
       llItem.className='llitem '+zt+(_llst==='done'?' st-done':'');
       llItem.textContent = (_llst==='done'?'✔ ':'')+it.zone;
       llItem.dataset.id = it.id;
@@ -1315,7 +1315,7 @@ function buildGantt(){
       const zx0=dayDiff(minDate,zs)*pxPerDay;
       const zw=Math.max(dayDiff(zs,ze)*pxPerDay,4);
       const zoneBg=document.createElement('div');
-      const zstatus=STATE.zones[it.id].status;
+      const zstatus=effectiveZoneStatus(it.id);
       zoneBg.className='zonebg '+zt+(zstatus==='done'?' done-zone':'');
       zoneBg.style.left=zx0+'px'; zoneBg.style.width=zw+'px';
       lane.appendChild(zoneBg);
@@ -1419,7 +1419,7 @@ function renderCursorAndActive(){
       row.innerHTML = '<i class="dot" style="background:var(--'+t+')"></i>'+
         (selectedBlocks.size>1?'<span style="font-size:10px;font-weight:700;color:var(--accent);margin-right:4px;">'+a.blk+'</span>':'')+
         '<span class="badge">'+a.it.zone+'</span>'+
-        '<span class="stchip" style="background:'+STATUS_HEX[a.st.status]+'">'+STATUS_LABEL[a.st.status]+'</span>'+
+        '<span class="stchip" style="background:'+STATUS_HEX[effectiveZoneStatus(a.it.id)]+'">'+STATUS_LABEL[effectiveZoneStatus(a.it.id)]+'</span>'+
         '<span class="sub">'+a.st.start+' \u2192 '+a.st.end+'</span>'+
         (a.curTask ? '<span class="task">Current task: '+a.curTask+'</span>' : '');
       row.onclick = ()=> openModal(a.it.id);
@@ -1445,7 +1445,7 @@ function openModal(id){
   pill.style.background = typePillColor[t];
   document.getElementById('zoneStart').value = st.start;
   document.getElementById('zoneEnd').value = st.end;
-  document.getElementById('zoneStatus').value = st.status;
+  document.getElementById('zoneStatus').value = effectiveZoneStatus(id);
   renderTaskRows(id);
   overlay.classList.add('open');
 }
@@ -1552,9 +1552,28 @@ function zoneIdsForBlock(blk){
   BLOCKS[blk].forEach(sec=>sec.items.forEach(it=>ids.push(it.id)));
   return ids;
 }
+// Derive zone status from task statuses when zone-level status is still 'notstarted'
+// (i.e. user hasn't manually overridden it). This keeps manual overrides intact
+// while auto-reflecting task-level progress everywhere.
+function effectiveZoneStatus(id){
+  const zst = STATE.zones[id].status;
+  // If user explicitly set it to something other than notstarted, respect that
+  if(zst !== 'notstarted') return zst;
+  // Auto-derive from task statuses
+  const tasks = Object.values(STATE.tasks[id]);
+  if(!tasks.length) return 'notstarted';
+  const doneN      = tasks.filter(t=>t.status==='done').length;
+  const inprogN    = tasks.filter(t=>t.status==='inprogress').length;
+  const delayedN   = tasks.filter(t=>t.status==='delayed').length;
+  if(doneN === tasks.length)        return 'done';
+  if(delayedN > 0)                  return 'delayed';
+  if(doneN > 0 || inprogN > 0)     return 'inprogress';
+  return 'notstarted';
+}
+
 function statusCountsFor(ids){
   const c={notstarted:0,inprogress:0,done:0,delayed:0};
-  ids.forEach(id=>c[STATE.zones[id].status]++);
+  ids.forEach(id=>c[effectiveZoneStatus(id)]++);
   return c;
 }
 function taskCompletionFor(ids){
@@ -1563,6 +1582,14 @@ function taskCompletionFor(ids){
     Object.values(STATE.tasks[id]).forEach(t=>{ total++; if(t.status==='done') done++; });
   });
   return total ? Math.round(done/total*100) : 0;
+}
+function taskActiveFor(ids){
+  // % of tasks that are Done OR In Progress
+  let total=0, active=0;
+  ids.forEach(id=>{
+    Object.values(STATE.tasks[id]).forEach(t=>{ total++; if(t.status==='done'||t.status==='inprogress') active++; });
+  });
+  return total ? Math.round(active/total*100) : 0;
 }
 
 // ---------- Last Planner System helpers ----------
@@ -1775,7 +1802,8 @@ function renderDashboard(){
   const ppcColor = ppc.pct===null ? 'var(--text-dim)' : (ppc.pct>=80?'var(--st-done)':ppc.pct>=50?'var(--st-inprogress)':'var(--st-delayed)');
   top.innerHTML =
     '<div class="statcard"><div class="num">'+allIds.length+'</div><div class="lbl">Total Zones (all blocks)</div></div>'+
-    '<div class="statcard"><div class="num" style="color:var(--st-done)">'+allPct+'%</div><div class="lbl">Overall Task Completion</div></div>'+
+    '<div class="statcard"><div class="num" style="color:var(--st-done)">'+allPct+'%</div><div class="lbl">Tasks Done</div></div>'+
+    '<div class="statcard"><div class="num" style="color:var(--st-inprogress)">'+taskActiveFor(allIds)+'%</div><div class="lbl">Tasks Done or In Progress</div></div>'+
     '<div class="statcard"><div class="num" style="color:'+ppcColor+'">'+ppcDisplay+'</div><div class="lbl">PPC — Last 7 Days ('+ppc.done+'/'+ppc.total+' promised)</div></div>'+
     '<div class="statcard"><div class="num" style="color:var(--st-delayed)">'+allCounts.delayed+'</div><div class="lbl">Zones Currently Delayed</div></div>';
 
@@ -1832,7 +1860,9 @@ function renderDashboard(){
     const card = document.createElement('div');
     card.className='blockcard';
     card.innerHTML =
-      '<div class="blockcardhead"><h3>Block '+blk+'</h3><span class="pctbadge">'+pct+'% complete</span></div>'+
+      '<div class="blockcardhead"><h3>Block '+blk+'</h3>'+
+        '<span class="pctbadge" style="color:var(--st-done);">'+pct+'% done</span>'+
+        '<span class="pctbadge" style="color:var(--st-inprogress);margin-left:8px;">'+taskActiveFor(ids)+'% active</span></div>'+
       '<div class="blockcardbody">'+
         '<div class="donutwrap">'+donutSVG(counts,128,18)+
           '<div class="center"><div class="p">'+ids.length+'</div><div class="s">zones</div></div>'+
@@ -2065,13 +2095,17 @@ function buildPrintReport(){
   p0.innerHTML = '<div class="ptitle">SKN4C49 — External Works Takt Plan</div>'+
     '<div class="psub">MCWP &amp; Gondola Tracker — Status Report — Generated '+fmtD(new Date())+'</div>';
   const table = document.createElement('table'); table.className='psummarytable';
-  table.innerHTML = '<tr><th>Block</th><th>Zones</th><th>% Complete</th><th>Done</th><th>In Progress</th><th>Delayed</th><th>Not Started</th></tr>';
+  table.innerHTML = '<tr><th>Block</th><th>Zones</th><th>% Done</th><th>% Active<br><small style="font-weight:400;font-size:9px;">(Done + In Progress)</small></th><th>Done</th><th>In Progress</th><th>Delayed</th><th>Not Started</th></tr>';
   BLOCK_NAMES.forEach(blk=>{
     const ids = zoneIdsForBlock(blk);
     const counts = statusCountsFor(ids);
     const pct = taskCompletionFor(ids);
+    const activePct = taskActiveFor(ids);
     const tr = document.createElement('tr');
-    tr.innerHTML = '<td>Block '+blk+'</td><td>'+ids.length+'</td><td>'+pct+'%</td><td>'+counts.done+'</td><td>'+counts.inprogress+'</td><td>'+counts.delayed+'</td><td>'+counts.notstarted+'</td>';
+    tr.innerHTML = '<td><b>Block '+blk+'</b></td><td>'+ids.length+'</td>'+
+      '<td style="color:#15803d;font-weight:700;">'+pct+'%</td>'+
+      '<td style="color:#d97706;font-weight:700;">'+activePct+'%</td>'+
+      '<td>'+counts.done+'</td><td>'+counts.inprogress+'</td><td>'+counts.delayed+'</td><td>'+counts.notstarted+'</td>';
     table.appendChild(tr);
   });
   p0.appendChild(table);
