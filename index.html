@@ -17,8 +17,10 @@
   header h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.2px;}
   header h1 span{color:var(--text-dim);font-weight:400;}
   .tabs{display:flex;gap:6px;}
-  .tab{padding:7px 16px;border-radius:7px;background:var(--panel2);border:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--text-dim);font-weight:600;}
-  .tab.active{background:var(--accent);color:#06121f;border-color:var(--accent);}
+  .tab{padding:7px 16px;border-radius:7px;background:var(--panel2);border:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--text-dim);font-weight:600;user-select:none;}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .tab.active .blk-check{opacity:1;}
+  .blk-check{opacity:0;font-size:10px;margin-right:4px;}
   .viewtoggle{display:flex;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:3px;}
   .viewtoggle button{padding:6px 14px;border:none;background:transparent;color:var(--text-dim);border-radius:5px;cursor:pointer;font-size:12.5px;font-weight:600;}
   .viewtoggle button.active{background:var(--accent);color:#06121f;}
@@ -38,7 +40,7 @@
   .pin.gondola{border-color:var(--gondola);}
   .pin.st-notstarted{background:rgba(91,102,117,.30);}
   .pin.st-inprogress{background:rgba(245,158,11,.40);}
-  .pin.st-done{background:rgba(34,197,94,.40);}
+  .pin.st-done{background:rgba(20,83,45,.70);}
   .pin.st-delayed{background:rgba(239,68,68,.45);}
   .pin.active-now{box-shadow:0 0 0 3px var(--cursor),0 0 12px var(--cursor);z-index:5;}
   .legend{display:flex;gap:14px;padding:10px 14px;font-size:11.5px;color:var(--text-dim);border-top:1px solid var(--border);flex-wrap:wrap;}
@@ -51,7 +53,7 @@
   .zchip{font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:5px;cursor:pointer;border:2px solid transparent;color:#0a0e13;white-space:nowrap;}
   .zchip.st-notstarted{background:#3a4250;color:#c4ccd6;}
   .zchip.st-inprogress{background:var(--st-inprogress);}
-  .zchip.st-done{background:var(--st-done);}
+  .zchip.st-done{background:#14532d;color:#86efac;border-color:#15803d;}
   .zchip.st-delayed{background:var(--st-delayed);color:#fff;}
   .zchip.active-now{border-color:var(--cursor);box-shadow:0 0 6px var(--cursor);}
   .activelist{max-height:280px;overflow-y:auto;}
@@ -75,6 +77,7 @@
   .llitem.mcwp{color:var(--mcwp-light);}
   .llitem.gondola{color:var(--gondola-light);}
   .llitem.cursoractive{color:var(--cursor)!important;background:rgba(245,158,11,.09);}
+  .llitem.st-done{color:#15803d!important;font-style:italic;}
   .ganttscroll{flex:1;overflow-x:auto;overflow-y:visible;min-width:0;}
   .ganttinner{position:relative;}
   .timehead{height:44px;background:var(--panel2);z-index:5;border-bottom:1px solid var(--border);position:sticky;top:0;}
@@ -89,19 +92,20 @@
   .zonebg{position:absolute;top:0;bottom:0;opacity:.09;pointer-events:none;z-index:0;}
   .zonebg.mcwp{background:#2563eb;}
   .zonebg.gondola{background:#db2777;}
+  .zonebg.done-zone{background:#15803d!important;opacity:.18!important;}
   @keyframes pulseRed{0%,100%{opacity:1;}50%{opacity:.45;}}
   @keyframes stripeMove{from{background-position:0 0;}to{background-position:14px 0;}}
-  .seg{position:absolute;top:5px;height:20px;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.5);overflow:hidden;border:2px solid transparent;}
-  .seg.st-notstarted{border:2px dashed rgba(255,255,255,.3);}
-  .seg.st-inprogress{border-color:var(--st-inprogress);}
-  .seg.st-done{border-color:var(--st-done);}
-  .seg.st-delayed{border-color:var(--st-delayed);}
+  .seg{position:absolute;top:5px;height:20px;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.3);overflow:hidden;border:2px solid transparent;transition:filter .15s;}
+  .seg.st-notstarted{border:2px dashed rgba(0,0,0,.2);opacity:.38;}
+  .seg.st-inprogress{border-color:var(--st-inprogress);box-shadow:0 0 0 1px var(--st-inprogress);}
+  .seg.st-done{border:1px solid #15803d;filter:brightness(0.93) saturate(1.0);box-shadow:none;}
+  .seg.st-delayed{border-color:var(--st-delayed);box-shadow:0 0 0 1px var(--st-delayed);}
   .segoverlay{position:absolute;inset:0;pointer-events:none;}
-  .segoverlay.notstarted{background:rgba(255,255,255,.55);}
-  .segoverlay.inprogress{background-image:repeating-linear-gradient(45deg, rgba(0,0,0,.15) 0 5px, transparent 5px 10px);background-size:14px 14px;animation:stripeMove .9s linear infinite;}
-  .segoverlay.done{background:rgba(0,0,0,.08);}
+  .segoverlay.notstarted{background:rgba(255,255,255,.0);}
+  .segoverlay.inprogress{background-image:repeating-linear-gradient(45deg, rgba(0,0,0,.12) 0 5px, transparent 5px 10px);background-size:14px 14px;animation:stripeMove .9s linear infinite;}
+  .segoverlay.done{background:transparent;}
   .segoverlay.delayed{background-image:repeating-linear-gradient(45deg, rgba(220,38,38,.4) 0 5px, rgba(255,255,255,.3) 5px 10px);}
-  .segicon{position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9);pointer-events:none;z-index:2;}
+  .segicon{position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:900;color:#4ade80;text-shadow:0 0 4px rgba(0,0,0,.8),0 1px 2px rgba(0,0,0,1);pointer-events:none;z-index:2;letter-spacing:-1px;}
   .cursorline{position:absolute;top:0;bottom:0;width:2px;background:var(--cursor);z-index:6;pointer-events:none;}
   .cursorflag{position:absolute;top:-1px;left:-26px;background:var(--cursor);color:#1a1200;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;z-index:7;}
   .taskLegendWrap{padding:10px 14px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);}
@@ -153,7 +157,7 @@
   .mapoverlay.active-date{opacity:.82;border-width:3px;}
   .mapoverlay.st-notstarted{background:rgba(91,102,117,.5);}
   .mapoverlay.st-inprogress{background:rgba(245,158,11,.45);}
-  .mapoverlay.st-done{background:rgba(34,197,94,.45);}
+  .mapoverlay.st-done{background:rgba(20,83,45,.65);}
   .mapoverlay.st-delayed{background:rgba(239,68,68,.5);}
   .mapoverlay.active-date.st-notstarted{border-color:var(--cursor);box-shadow:0 0 8px var(--cursor);}
   .mapoverlay.active-date.st-inprogress{border-color:var(--st-inprogress);box-shadow:0 0 10px var(--st-inprogress);}
@@ -285,14 +289,21 @@
     <button data-mv="verify" style="border-color:var(--st-inprogress);color:var(--st-inprogress);">✓ Verify Data</button>
     <button data-mv="dashboard">Dashboard</button>
   </div>
-  <div class="tabs" id="blockTabs"></div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <div class="tabs" id="blockTabs"></div>
+    <button class="iobtn" id="selAllBlks" style="font-size:11px;padding:5px 10px;">All</button>
+    <button class="iobtn" id="selNoneBlks" style="font-size:11px;padding:5px 10px;">None</button>
+  </div>
   <div class="viewtoggle" id="viewToggle"></div>
   <div class="datebox" id="dateBox">—</div>
   <div class="spacer"></div>
-  <button class="iobtn" id="exportBtn">⬇ Export progress (Excel)</button>
-  <button class="iobtn" id="importBtn">⬆ Import progress (Excel)</button>
-  <button class="iobtn" id="exportPdfBtn" style="border-color:var(--mcwp);">🖨️ Print / Save as PDF</button>
-  <input type="file" id="importFile" accept=".xlsx,.csv" style="display:none">
+  <button class="iobtn" id="exportJsonBtn">⬇ Export JSON</button>
+  <button class="iobtn" id="importJsonBtn">⬆ Import JSON</button>
+  <button class="iobtn" id="exportExcelBtn" style="border-color:var(--mcwp);">⬇ Export Excel</button>
+  <button class="iobtn" id="importExcelBtn" style="border-color:var(--mcwp);">⬆ Import Excel</button>
+  <button class="iobtn" id="exportPdfBtn" style="border-color:var(--gondola);">🖨️ Print / PDF</button>
+  <input type="file" id="importFileJson" accept=".json" style="display:none">
+  <input type="file" id="importFileExcel" accept=".xlsx,.csv" style="display:none">
 </header>
 
 <div class="openbanner" id="openBanner">
@@ -333,7 +344,7 @@
         <span><b>Status look:</b></span>
         <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:16px;height:12px;border:2px dashed rgba(255,255,255,.4);background:rgba(13,17,22,.5);border-radius:3px;"></span>Not Started — faded, dashed</span>
         <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:16px;height:12px;border:2px solid var(--st-inprogress);background:repeating-linear-gradient(45deg,#fff5 0 3px,transparent 3px 6px),#555;border-radius:3px;"></span>In Progress — striped, amber</span>
-        <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:16px;height:12px;border:2px solid var(--st-done);background:#3338;border-radius:3px;"></span>Done — solid + ✓</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:16px;height:12px;border:2px solid var(--st-done);background:#3338;border-radius:3px;"></span>Done — darkened + ✔</span>
         <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:16px;height:12px;border:2px solid var(--st-delayed);background:repeating-linear-gradient(45deg,#7f00004d 0 3px,#0006 3px 6px);border-radius:3px;"></span>Delayed — red stripes + ⚠</span>
       </div>
       <div class="taskLegendWrap" id="taskLegend"></div>
@@ -709,7 +720,7 @@ document.getElementById('dismissBanner').onclick = ()=>{
 };
 
 const BLOCK_NAMES = Object.keys(BLOCKS);
-let currentBlock = BLOCK_NAMES[0];
+let selectedBlocks = new Set([BLOCK_NAMES[0]]);
 let currentView = 'week';
 let mainView = 'planner';
 
@@ -773,12 +784,24 @@ const PX_PER_DAY = {day:42, week:14, month:5};
 const tabsEl = document.getElementById('blockTabs');
 BLOCK_NAMES.forEach(b=>{
   const d=document.createElement('div');
-  d.className='tab'+(b===currentBlock?' active':'');
-  d.textContent='BLK '+b;
-  d.onclick=()=>{currentBlock=b; refreshAll();};
+  d.className='tab'+(selectedBlocks.has(b)?' active':'');
+  d.innerHTML='<span class="blk-check">✓</span>BLK '+b;
+  d.title='Click to toggle Block '+b+' in/out of view';
+  d.onclick=()=>{
+    if(selectedBlocks.has(b)){
+      if(selectedBlocks.size>1) selectedBlocks.delete(b); // keep at least 1
+    } else {
+      selectedBlocks.add(b);
+    }
+    refreshAll();
+  };
   d.dataset.blk=b;
   tabsEl.appendChild(d);
 });
+// All / None buttons
+document.getElementById('selAllBlks').onclick=()=>{ BLOCK_NAMES.forEach(b=>selectedBlocks.add(b)); refreshAll(); };
+document.getElementById('selNoneBlks').onclick=()=>{ const first=BLOCK_NAMES[0]; selectedBlocks=new Set([first]); refreshAll(); };
+
 const viewEl = document.getElementById('viewToggle');
 [['day','Day'],['week','Week'],['month','Month']].forEach(([k,label])=>{
   const b=document.createElement('button');
@@ -1088,12 +1111,13 @@ function refreshAll(){ render(); renderDashboard(); renderLPS(); buildMapsTab();
 
 
 function render(){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.blk===currentBlock));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', selectedBlocks.has(t.dataset.blk)));
   document.querySelectorAll('#viewToggle button').forEach(t=>t.classList.toggle('active', t.dataset.view===currentView));
   const pbn = document.getElementById('plannerBlockName');
-  if(pbn) pbn.textContent = currentBlock;
-  // keep hidden img updated for pin overlay legacy support
-  document.getElementById('mapImg').src = 'data:image/png;base64,' + IMAGES[currentBlock];
+  if(pbn) pbn.textContent = [...selectedBlocks].join(', ');
+  // keep hidden img updated for pin overlay legacy support (use first selected block)
+  const _firstBlk=[...selectedBlocks][0];
+  document.getElementById('mapImg').src = 'data:image/png;base64,' + IMAGES[_firstBlk];
   buildGantt();
   buildTaskLegend();
   buildPins();
@@ -1113,7 +1137,7 @@ function buildTaskLegend(){
   const wrap = document.getElementById('taskLegend');
   wrap.innerHTML='';
   const seen = new Set();
-  BLOCKS[currentBlock].forEach(sec=>{
+  [...selectedBlocks].forEach(blk=>BLOCKS[blk].forEach(sec=>{
     if(seen.has(sec.cycleKey)) return;
     seen.add(sec.cycleKey);
     const cyc = CYCLES[sec.cycleKey];
@@ -1127,15 +1151,16 @@ function buildTaskLegend(){
       row.appendChild(chip);
     });
     wrap.appendChild(row);
-  });
+  }));
 }
 
 function buildPins(){
   const layer = document.getElementById('pinLayer');
   layer.innerHTML='';
-  const markers = MARKERS[currentBlock] || {};
+  const _pb=[...selectedBlocks][0];
+  const markers = MARKERS[_pb] || {};
   Object.keys(markers).forEach(zoneName=>{
-    const id = ZONE_IDS_BY_NAME[currentBlock][zoneName];
+    const id = ZONE_IDS_BY_NAME[_pb][zoneName];
     if(!id) return;
     const m = markers[zoneName];
     const st = STATE.zones[id];
@@ -1155,28 +1180,35 @@ function buildPins(){
 function buildZoneGrid(){
   const wrap = document.getElementById('zoneGrid');
   wrap.innerHTML='';
-  const allNames = Object.keys(ZONE_IDS_BY_NAME[currentBlock]).sort();
-  const mcwpNames = allNames.filter(n=>zoneType(n)==='mcwp');
-  const gondolaNames = allNames.filter(n=>zoneType(n)==='gondola');
-  function buildGroup(label, names){
-    if(names.length===0) return;
-    const lab=document.createElement('div'); lab.className='gridgrouplabel'; lab.textContent=label+' ('+names.length+')';
-    wrap.appendChild(lab);
-    const grid=document.createElement('div'); grid.className='chipgrid';
-    names.forEach(n=>{
-      const id = ZONE_IDS_BY_NAME[currentBlock][n];
-      const st = STATE.zones[id];
-      const chip=document.createElement('div');
-      chip.className='zchip st-'+st.status;
-      chip.textContent=n;
-      chip.dataset.id=id;
-      chip.onclick=()=>openModal(id);
-      grid.appendChild(chip);
-    });
-    wrap.appendChild(grid);
-  }
-  buildGroup('MCWP', mcwpNames);
-  buildGroup('Gondola', gondolaNames);
+  [...selectedBlocks].forEach(blk=>{
+    if(selectedBlocks.size>1){
+      const blkLbl=document.createElement('div');
+      blkLbl.style.cssText='font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);padding:8px 0 3px;border-top:1px solid var(--border);margin-top:6px;';
+      blkLbl.textContent='Block '+blk;
+      wrap.appendChild(blkLbl);
+    }
+    const allNames=Object.keys(ZONE_IDS_BY_NAME[blk]).sort();
+    const mcwpNames=allNames.filter(n=>zoneType(n)==='mcwp');
+    const gondolaNames=allNames.filter(n=>zoneType(n)==='gondola');
+    function buildGroup(label,names){
+      if(!names.length) return;
+      const lab=document.createElement('div'); lab.className='gridgrouplabel'; lab.textContent=label+' ('+names.length+')';
+      wrap.appendChild(lab);
+      const grid=document.createElement('div'); grid.className='chipgrid';
+      names.forEach(n=>{
+        const id=ZONE_IDS_BY_NAME[blk][n];
+        const st=STATE.zones[id];
+        const chip=document.createElement('div');
+        chip.className='zchip st-'+st.status;
+        chip.textContent=n; chip.dataset.id=id;
+        chip.onclick=()=>openModal(id);
+        grid.appendChild(chip);
+      });
+      wrap.appendChild(grid);
+    }
+    buildGroup('MCWP',mcwpNames);
+    buildGroup('Gondola',gondolaNames);
+  });
 }
 
 function buildGantt(){
@@ -1228,21 +1260,36 @@ function buildGantt(){
   head.appendChild(majorRow); head.appendChild(minorRow);
   inner.appendChild(head);
 
-  const sections = BLOCKS[currentBlock];
-  sections.forEach(sec=>{
+  // render sections for ALL selected blocks
+  [...selectedBlocks].forEach(blk=>{
+    const blkSections = BLOCKS[blk];
+
+    // block separator row in label col + gantt
+    if(selectedBlocks.size > 1){
+      const llBlkHead = document.createElement('div');
+      llBlkHead.style.cssText='height:24px;background:var(--accent);display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:900;color:#fff;letter-spacing:.4px;';
+      llBlkHead.textContent = 'BLK '+blk;
+      labelCol.appendChild(llBlkHead);
+      const ganttBlkHead = document.createElement('div');
+      ganttBlkHead.style.cssText='height:24px;background:var(--accent);display:flex;align-items:center;padding:0 12px;font-size:11px;font-weight:900;color:#fff;letter-spacing:.5px;width:'+totalWidth+'px;';
+      ganttBlkHead.textContent = '── BLOCK '+blk+' ──';
+      inner.appendChild(ganttBlkHead);
+    }
+
+  blkSections.forEach(sec=>{
     const cyc = CYCLES[sec.cycleKey];
 
     // labels column: section header
     const llSecHead = document.createElement('div'); llSecHead.className='llsechead';
     const stype = sec.cycleKey==='mcwp'?'MCWP':sec.cycleKey==='gondolaAfter'?'G+M':'GON';
     llSecHead.title = sec.title;
-    llSecHead.textContent = stype+' ('+sec.items.length+')';
+    llSecHead.textContent = (selectedBlocks.size>1?blk+' ':'')+stype+' ('+sec.items.length+')';
     labelCol.appendChild(llSecHead);
 
     // bars column: section
     const secEl=document.createElement('div'); secEl.className='section';
     const secHead=document.createElement('div'); secHead.className='sectionhead'; secHead.style.width=totalWidth+'px';
-    secHead.textContent = sec.title + '  (' + sec.items.length + ' zones · ' + cyc.tasks.length + '-task cycle, ' + cyc.totalDays + 'd)';
+    secHead.textContent = (selectedBlocks.size>1?'['+blk+'] ':'')+sec.title + '  (' + sec.items.length + ' zones · ' + cyc.tasks.length + '-task cycle, ' + cyc.totalDays + 'd)';
     secEl.appendChild(secHead);
 
     sec.items.forEach(it=>{
@@ -1251,8 +1298,9 @@ function buildGantt(){
 
       // label column item
       const llItem = document.createElement('div');
-      llItem.className='llitem '+zt;
-      llItem.textContent = it.zone;
+      const _llst = STATE.zones[it.id].status;
+      llItem.className='llitem '+zt+(_llst==='done'?' st-done':'');
+      llItem.textContent = (_llst==='done'?'✔ ':'')+it.zone;
       llItem.dataset.id = it.id;
       llItem.title = it.zone;
       llItem.onclick = ()=> openModal(it.id);
@@ -1267,7 +1315,8 @@ function buildGantt(){
       const zx0=dayDiff(minDate,zs)*pxPerDay;
       const zw=Math.max(dayDiff(zs,ze)*pxPerDay,4);
       const zoneBg=document.createElement('div');
-      zoneBg.className='zonebg '+zt;
+      const zstatus=STATE.zones[it.id].status;
+      zoneBg.className='zonebg '+zt+(zstatus==='done'?' done-zone':'');
       zoneBg.style.left=zx0+'px'; zoneBg.style.width=zw+'px';
       lane.appendChild(zoneBg);
 
@@ -1286,9 +1335,9 @@ function buildGantt(){
         seg.style.background=TASK_COLORS[idx % TASK_COLORS.length];
         seg.style.zIndex=1;
         const ov=document.createElement('div'); ov.className='segoverlay '+ts.status; seg.appendChild(ov);
-        if(w>=15){
-          const iconChar = ts.status==='done' ? '\u2713' : ts.status==='delayed' ? '\u26A0' : '';
-          if(iconChar){ const icon=document.createElement('span'); icon.className='segicon'; icon.textContent=iconChar; seg.appendChild(icon); }
+        {
+          const iconChar = ts.status==='done' ? '\u2714\uFE0F' : ts.status==='delayed' ? '\u26A0' : '';
+          if(iconChar && w>=10){ const icon=document.createElement('span'); icon.className='segicon'; icon.textContent=iconChar; seg.appendChild(icon); }
         }
         seg.title=it.zone+' \u2014 '+(idx+1)+'. '+t.activity+' ('+t.subcon+')\n'+ts.start+' \u2192 '+ts.end+'\nStatus: '+STATUS_LABEL[ts.status];
         lane.appendChild(seg);
@@ -1296,7 +1345,8 @@ function buildGantt(){
       secEl.appendChild(lane);
     });
     inner.appendChild(secEl);
-  });
+  }); // end blkSections.forEach
+  }); // end selectedBlocks.forEach
 }
 
 function renderCursorAndActive(){
@@ -1341,7 +1391,8 @@ function renderCursorAndActive(){
   const activeEl = document.getElementById('activeList');
   activeEl.innerHTML='';
   const actives = [];
-  BLOCKS[currentBlock].forEach(sec=>{
+  [...selectedBlocks].forEach(blk=>{
+  BLOCKS[blk].forEach(sec=>{
     const cyc = CYCLES[sec.cycleKey];
     sec.items.forEach(it=>{
       const st = STATE.zones[it.id];
@@ -1353,17 +1404,20 @@ function renderCursorAndActive(){
           const ds=parseD(ts.start), de=parseD(ts.end);
           if(d>=ds && d<de) curTask = t.activity;
         });
-        actives.push({it, st, section: sec.title, curTask});
+        actives.push({it, st, section: sec.title, curTask, blk});
       }
     });
   });
+  });
   if(actives.length===0){
-    activeEl.innerHTML = '<div class="empty">No MCWP or Gondola active in Block '+currentBlock+' on this date.</div>';
+    const selStr=[...selectedBlocks].join(', ');
+    activeEl.innerHTML = '<div class="empty">No MCWP or Gondola active in Blocks '+selStr+' on this date.</div>';
   } else {
     actives.forEach(a=>{
       const t = zoneType(a.it.zone);
       const row=document.createElement('div'); row.className='azitem';
       row.innerHTML = '<i class="dot" style="background:var(--'+t+')"></i>'+
+        (selectedBlocks.size>1?'<span style="font-size:10px;font-weight:700;color:var(--accent);margin-right:4px;">'+a.blk+'</span>':'')+
         '<span class="badge">'+a.it.zone+'</span>'+
         '<span class="stchip" style="background:'+STATUS_HEX[a.st.status]+'">'+STATUS_LABEL[a.st.status]+'</span>'+
         '<span class="sub">'+a.st.start+' \u2192 '+a.st.end+'</span>'+
@@ -1793,18 +1847,74 @@ function renderDashboard(){
       '<div class="typesplit"><span><b>'+mcwpIds.length+'</b> MCWP zones</span><span><b>'+gondolaIds.length+'</b> Gondola zones</span>'+
         '<span style="margin-left:auto;cursor:pointer;color:var(--accent);" data-goto="'+blk+'">Open in Planner →</span></div>';
     card.querySelector('[data-goto]').onclick = ()=>{
-      currentBlock = blk;
+      selectedBlocks = new Set([blk]);
       document.querySelector('#mainViewToggle button[data-mv="planner"]').click();
     };
     grid.appendChild(card);
   });
 }
 
-// ---------- Excel export/import (SheetJS; CSV fallback if library blocked) ----------
+// ---------- JSON export / import (direct STATE serialisation) ----------
+document.getElementById('exportJsonBtn').onclick = ()=>{
+  const filename = 'SKN4C49_Takt_Progress_'+fmtD(new Date())+'.json';
+  const blob = new Blob([JSON.stringify(STATE, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Progress exported as JSON — '+filename, 'ok');
+};
+
+document.getElementById('importJsonBtn').onclick = ()=> document.getElementById('importFileJson').click();
+document.getElementById('importFileJson').onchange = (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const incoming = JSON.parse(ev.target.result);
+      if(!incoming.zones || !incoming.tasks) throw new Error('Not a valid SKN4C49 progress file — missing "zones" or "tasks" keys.');
+      let zonesLoaded=0, tasksLoaded=0, zonesSkipped=0, tasksSkipped=0;
+
+      // Merge zones
+      Object.entries(incoming.zones).forEach(([id, val])=>{
+        if(STATE.zones[id]){
+          STATE.zones[id].start  = val.start  || STATE.zones[id].start;
+          STATE.zones[id].end    = val.end    || STATE.zones[id].end;
+          STATE.zones[id].status = val.status || STATE.zones[id].status;
+          zonesLoaded++;
+        } else { zonesSkipped++; }
+      });
+
+      // Merge tasks
+      Object.entries(incoming.tasks).forEach(([zoneId, taskMap])=>{
+        if(!STATE.tasks[zoneId]){ tasksSkipped++; return; }
+        Object.entries(taskMap).forEach(([idx, val])=>{
+          if(STATE.tasks[zoneId][idx]){
+            STATE.tasks[zoneId][idx].start      = val.start      || STATE.tasks[zoneId][idx].start;
+            STATE.tasks[zoneId][idx].end        = val.end        || STATE.tasks[zoneId][idx].end;
+            STATE.tasks[zoneId][idx].status     = val.status     || STATE.tasks[zoneId][idx].status;
+            STATE.tasks[zoneId][idx].delayCause = val.delayCause || null;
+            tasksLoaded++;
+          }
+        });
+      });
+
+      refreshAll();
+      const msg = 'JSON imported ✓  Zones: '+zonesLoaded+' updated'+(zonesSkipped?' ('+zonesSkipped+' skipped — not in this build)':'')+
+        ' · Tasks: '+tasksLoaded+' updated'+(tasksSkipped?' ('+tasksSkipped+' zone(s) skipped)':'');
+      toast(msg, 'ok');
+      if(zonesSkipped>0) toast('⚠ '+zonesSkipped+' zone ID(s) in the JSON did not match this build\'s data. This usually means the JSON was saved from a different version — the matching zones were still imported correctly.', 'warn');
+    } catch(err){ toast('JSON import failed: '+err.message, 'warn'); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+};
+
+// ---------- Excel export / import (SheetJS; CSV fallback) ----------
 function csvEscapeProgress(v){ const s=String(v==null?'':v); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
 
-document.getElementById('exportBtn').onclick = ()=>{
-  // Build flat rows for all zones + all tasks
+document.getElementById('exportExcelBtn').onclick = ()=>{
   const zoneRows = [['Type','Block','Section','Zone','Planned Start','Planned End','Zone Status']];
   const taskRows = [['Type','Zone ID','Task #','Task','Subcon','Planned Start','Planned End','Task Status','Delay Cause']];
   BLOCK_NAMES.forEach(blk=>{
@@ -1827,11 +1937,11 @@ document.getElementById('exportBtn').onclick = ()=>{
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(zoneRows), 'Zones');
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(taskRows), 'Tasks');
       XLSX.writeFile(wb, 'SKN4C49_Takt_Progress_'+fmtD(new Date())+'.xlsx');
-      toast('Progress exported to Excel (.xlsx) successfully.', 'ok');
+      toast('Progress exported to Excel (.xlsx).', 'ok');
       return;
-    }catch(err){ /* fall through to CSV */ }
+    } catch(err){ /* fall through */ }
   }
-  // CSV fallback
+  // CSV fallback when SheetJS not loaded (sandboxed preview / no network)
   const allRows = [...zoneRows, ['---'], ...taskRows];
   const csv = allRows.map(r=>r.map(csvEscapeProgress).join(',')).join('\r\n');
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
@@ -1840,11 +1950,11 @@ document.getElementById('exportBtn').onclick = ()=>{
   a.href=url; a.download='SKN4C49_Takt_Progress_'+fmtD(new Date())+'.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  toast('Progress exported as CSV (Excel library not available — open in browser tab for .xlsx).', 'ok');
+  toast('Exported as CSV (open in browser tab to get .xlsx).', 'ok');
 };
 
-document.getElementById('importBtn').onclick = ()=> document.getElementById('importFile').click();
-document.getElementById('importFile').onchange = (e)=>{
+document.getElementById('importExcelBtn').onclick = ()=> document.getElementById('importFileExcel').click();
+document.getElementById('importFileExcel').onchange = (e)=>{
   const file = e.target.files[0]; if(!file) return;
   const reader = new FileReader();
   const isXlsx = file.name.toLowerCase().endsWith('.xlsx');
@@ -1852,14 +1962,11 @@ document.getElementById('importFile').onchange = (e)=>{
     try{
       if(isXlsx && typeof XLSX !== 'undefined'){
         const wb = XLSX.read(ev.target.result, {type:'array'});
-        // Zones sheet
         const zws = wb.Sheets['Zones'];
         if(zws){
-          const rows = XLSX.utils.sheet_to_json(zws, {header:1}).slice(1); // skip header
-          rows.forEach(r=>{
+          XLSX.utils.sheet_to_json(zws,{header:1}).slice(1).forEach(r=>{
             if(r.length<7) return;
-            const [,blk,sec,zone,,, ] = r;
-            const id=blk+'|'+sec+'|'+zone;
+            const id=r[1]+'|'+r[2]+'|'+r[3];
             if(STATE.zones[id]){
               STATE.zones[id].start=String(r[4]||STATE.zones[id].start);
               STATE.zones[id].end=String(r[5]||STATE.zones[id].end);
@@ -1867,15 +1974,12 @@ document.getElementById('importFile').onchange = (e)=>{
             }
           });
         }
-        // Tasks sheet
         const tws = wb.Sheets['Tasks'];
         if(tws){
-          const rows = XLSX.utils.sheet_to_json(tws, {header:1}).slice(1);
-          rows.forEach(r=>{
+          XLSX.utils.sheet_to_json(tws,{header:1}).slice(1).forEach(r=>{
             if(r.length<9) return;
-            const [,zoneId,idxRaw,,,,,,] = r;
-            const idx=Number(idxRaw)-1;
-            if(STATE.tasks[zoneId] && STATE.tasks[zoneId][idx]){
+            const zoneId=r[1], idx=Number(r[2])-1;
+            if(STATE.tasks[zoneId]&&STATE.tasks[zoneId][idx]){
               STATE.tasks[zoneId][idx].start=String(r[5]||STATE.tasks[zoneId][idx].start);
               STATE.tasks[zoneId][idx].end=String(r[6]||STATE.tasks[zoneId][idx].end);
               STATE.tasks[zoneId][idx].status=r[7]||STATE.tasks[zoneId][idx].status;
@@ -1885,30 +1989,32 @@ document.getElementById('importFile').onchange = (e)=>{
         }
         refreshAll(); toast('Progress imported from Excel successfully.', 'ok');
       } else {
-        // Try CSV
-        const text = typeof ev.target.result === 'string' ? ev.target.result : new TextDecoder().decode(ev.target.result);
-        const lines = text.split(/\r?\n/).filter(l=>l.trim() && !l.startsWith('---'));
-        let inTasks=false;
-        lines.slice(1).forEach(line=>{
+        // CSV path
+        const text = typeof ev.target.result==='string' ? ev.target.result : new TextDecoder().decode(ev.target.result);
+        text.split(/\r?\n/).filter(l=>l.trim()&&!l.startsWith('---')).forEach(line=>{
           if(line.startsWith('ZONE,')){
-            const [,blk,sec,zone,,, status] = line.split(',');
-            const id=blk+'|'+sec+'|'+zone;
-            if(STATE.zones[id]) STATE.zones[id].status=status||STATE.zones[id].status;
+            const p=line.split(',');
+            const id=p[1]+'|'+p[2]+'|'+p[3];
+            if(STATE.zones[id]){
+              if(p[4]) STATE.zones[id].start=p[4];
+              if(p[5]) STATE.zones[id].end=p[5];
+              if(p[6]) STATE.zones[id].status=p[6];
+            }
           }
           if(line.startsWith('TASK,')){
-            const parts = line.split(',');
-            const zoneId=parts[1], idx=Number(parts[2])-1;
+            const p=line.split(',');
+            const zoneId=p[1], idx=Number(p[2])-1;
             if(STATE.tasks[zoneId]&&STATE.tasks[zoneId][idx]){
-              STATE.tasks[zoneId][idx].start=parts[5]||STATE.tasks[zoneId][idx].start;
-              STATE.tasks[zoneId][idx].end=parts[6]||STATE.tasks[zoneId][idx].end;
-              STATE.tasks[zoneId][idx].status=parts[7]||STATE.tasks[zoneId][idx].status;
-              STATE.tasks[zoneId][idx].delayCause=parts[8]||null;
+              if(p[5]) STATE.tasks[zoneId][idx].start=p[5];
+              if(p[6]) STATE.tasks[zoneId][idx].end=p[6];
+              if(p[7]) STATE.tasks[zoneId][idx].status=p[7];
+              STATE.tasks[zoneId][idx].delayCause=p[8]||null;
             }
           }
         });
         refreshAll(); toast('Progress imported from CSV successfully.', 'ok');
       }
-    }catch(err){ toast('Import failed: '+err.message,'warn'); }
+    } catch(err){ toast('Excel/CSV import failed: '+err.message, 'warn'); }
   };
   if(isXlsx && typeof XLSX !== 'undefined') reader.readAsArrayBuffer(file);
   else reader.readAsText(file);
@@ -1927,15 +2033,15 @@ function hideExportOverlay(){ document.getElementById('exportOverlay').classList
 function buildPrintGanttSection(blk){
   // Re-render a static, non-scrolling, month-view copy of the Gantt for this block, scaled to fit the printable page width.
   const MAX_WIDTH_PX = 930;
-  const savedBlock = currentBlock, savedView = currentView;
-  currentBlock = blk; currentView = 'month';
+  const savedBlk2 = new Set(selectedBlocks), savedView2 = currentView;
+  selectedBlocks = new Set([blk]); currentView = 'month';
   buildGantt(); // rebuilds the live #ganttInner for this block in month view
   const liveInner = document.getElementById('ganttInner');
   const naturalWidth = liveInner.scrollWidth;
   const naturalHeight = liveInner.scrollHeight;
   const clone = liveInner.cloneNode(true);
   clone.querySelectorAll('.cursorline').forEach(n=>n.remove());
-  currentBlock = savedBlock; currentView = savedView;
+  selectedBlocks = savedBlk2; currentView = savedView2;
 
   const scale = naturalWidth > MAX_WIDTH_PX ? (MAX_WIDTH_PX / naturalWidth) : 1;
   const outer = document.createElement('div');
